@@ -40,10 +40,8 @@ export default function Header() {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
         const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', session.user.id)
-          .single()
+          .from('profiles').select('is_admin')
+          .eq('id', session.user.id).single()
         const isEmailAdmin = session.user.email === 'doungmolagoungvaldes@gmail.com'
         setIsAdmin(!!profile?.is_admin || isEmailAdmin)
       }
@@ -57,13 +55,11 @@ export default function Header() {
     }
   }, [])
 
-  // Close mobile menu on outside tap
   useEffect(() => {
     if (!isMenuOpen) return
     const handler = (e: MouseEvent) => {
-      if (overlayRef.current && !overlayRef.current.contains(e.target as Node)) {
+      if (overlayRef.current && !overlayRef.current.contains(e.target as Node))
         setIsMenuOpen(false)
-      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -88,10 +84,11 @@ export default function Header() {
         style={
           scrolled
             ? {
-                background: 'rgba(0,0,0,0.72)',
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
+                background: 'rgba(5,5,5,0.65)',
+                backdropFilter: 'blur(28px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(28px) saturate(180%)',
                 borderBottom: '1px solid rgba(255,255,255,0.07)',
+                boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.04), 0 8px 32px rgba(0,0,0,0.32)',
               }
             : { background: 'transparent' }
         }
@@ -104,26 +101,23 @@ export default function Header() {
           </Link>
 
           {/* DESKTOP NAV */}
-          <nav className="hidden lg:flex items-center bg-gray-500/5 p-1.5 rounded-2xl border border-white/5">
+          <nav className="hidden lg:flex items-center lg-surface p-1.5 rounded-2xl">
             {navLinks.map((link) => {
               const isActive = pathname === link.href
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`group relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`group relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 ${
                     isActive
-                      ? 'text-brand-primary bg-brand-primary/10 shadow-sm'
-                      : 'opacity-40 hover:opacity-100 hover:bg-white/5'
+                      ? 'text-[#0ea5e9] lg-badge shadow-sm'
+                      : 'text-white/40 hover:text-white/90 hover:bg-white/5'
                   }`}
                 >
-                  <link.icon size={14} className={isActive ? 'text-brand-primary' : ''} />
+                  <link.icon size={14} className={isActive ? 'text-[#0ea5e9]' : ''} />
                   {link.name}
-                  {/* Animated underline */}
                   {!isActive && (
-                    <span
-                      className="absolute bottom-1 left-5 right-5 h-[1.5px] bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-200"
-                    />
+                    <span className="absolute bottom-1 left-5 right-5 h-[1.5px] bg-[#0ea5e9] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
                   )}
                 </Link>
               )
@@ -132,7 +126,7 @@ export default function Header() {
             {isAdmin && (
               <Link
                 href="/admin"
-                className="ml-2 flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-brand-primary/30 text-brand-primary bg-brand-primary/5 hover:bg-brand-primary hover:text-white transition-all animate-pulse hover:animate-none"
+                className="ml-2 flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest lg-btn-accent animate-pulse hover:animate-none"
               >
                 <ShieldCheck size={14} />
                 Admin Panel
@@ -142,38 +136,35 @@ export default function Header() {
 
           {/* RIGHT ICONS */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 mr-2 px-3 py-1.5 bg-gray-500/5 rounded-full border border-white/5">
+            {/* Cart pill */}
+            <div className="flex items-center mr-2 px-2 py-1.5 lg-surface rounded-full">
               <Link href="/cart" className="p-2 rounded-full hover:bg-white/10 transition-colors relative group">
-                <ShoppingCart size={18} className="opacity-50 group-hover:opacity-100 transition-opacity text-white" />
+                <ShoppingCart size={18} className="text-white/50 group-hover:text-white transition-colors" />
                 {cartCount > 0 && (
-                  <span className="absolute top-0 right-0 bg-brand-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#0ea5e9] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg shadow-sky-500/40">
                     {cartCount}
                   </span>
                 )}
               </Link>
             </div>
 
+            {/* Theme toggle */}
             <button
               onClick={toggleTheme}
-              className="p-3 rounded-xl transition-all border bg-white/5 border-white/10 text-sky-400 hover:bg-sky-400/10"
+              className="p-3 rounded-xl lg-btn text-sky-400"
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
+            {/* Hamburger */}
             <button
-              className="lg:hidden p-3 rounded-xl bg-white/10 text-white relative w-11 h-11 flex items-center justify-center"
+              className="lg:hidden p-3 rounded-xl lg-btn text-white w-11 h-11 flex items-center justify-center relative"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
             >
-              <span
-                className={`absolute block w-5 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-0' : '-translate-y-1.5'}`}
-              />
-              <span
-                className={`absolute block w-5 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`}
-              />
-              <span
-                className={`absolute block w-5 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? '-rotate-45 translate-y-0' : 'translate-y-1.5'}`}
-              />
+              <span className={`absolute block w-5 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? 'rotate-45' : '-translate-y-1.5'}`} />
+              <span className={`absolute block w-5 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`} />
+              <span className={`absolute block w-5 h-0.5 bg-white transition-all duration-300 ${isMenuOpen ? '-rotate-45' : 'translate-y-1.5'}`} />
             </button>
           </div>
         </div>
@@ -184,24 +175,24 @@ export default function Header() {
         className={`lg:hidden fixed inset-0 z-40 transition-all duration-300 ${
           isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
-        style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+        style={{
+          background: 'rgba(2,4,12,0.88)',
+          backdropFilter: 'blur(32px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(32px) saturate(180%)',
+        }}
       >
-        <div ref={overlayRef} className="flex flex-col justify-center h-full px-10 pt-24 space-y-3">
+        <div ref={overlayRef} className="flex flex-col justify-center h-full px-8 pt-24 space-y-2">
           {allLinks.map((link, i) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setIsMenuOpen(false)}
-              className={`flex items-center gap-4 p-4 rounded-2xl font-black uppercase tracking-widest text-[11px] text-white transition-all duration-300 ${
-                link.name === 'Admin Panel'
-                  ? 'bg-brand-primary/10 border border-brand-primary/20 text-brand-primary'
-                  : 'hover:bg-white/5 hover:text-brand-primary'
+              className={`flex items-center gap-4 p-4 rounded-2xl font-black uppercase tracking-widest text-[11px] text-white transition-all duration-300 lg-btn ${
+                link.name === 'Admin Panel' ? 'lg-btn-accent' : ''
               } ${isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-              style={{
-                transitionDelay: isMenuOpen ? `${i * 60}ms` : '0ms',
-              }}
+              style={{ transitionDelay: isMenuOpen ? `${i * 60}ms` : '0ms' }}
             >
-              <link.icon size={20} className={link.name === 'Admin Panel' ? 'text-brand-primary' : 'opacity-60'} />
+              <link.icon size={20} className={link.name === 'Admin Panel' ? 'text-[#0ea5e9]' : 'opacity-50'} />
               {link.name}
             </Link>
           ))}

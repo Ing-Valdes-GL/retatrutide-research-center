@@ -74,7 +74,7 @@ export default function Footer() {
                   placeholder="Enter your email..."
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-6 pr-16 py-5 rounded-[2rem] text-xs font-black uppercase tracking-widest outline-none transition-all border-2 bg-gray-900 border-white/5 focus:border-sky-500 text-white"
+                  className="w-full pl-6 pr-16 py-5 rounded-[2rem] text-xs font-black uppercase tracking-widest outline-none transition-all lg-surface focus:border-sky-500/60 text-white"
                 />
                 <button
                   disabled={loading}
@@ -87,7 +87,7 @@ export default function Footer() {
               </form>
             </div>
 
-            <div className="flex items-center gap-3 text-sky-500 font-black text-xs uppercase tracking-widest bg-sky-500/10 w-fit px-6 py-3 rounded-2xl border border-sky-500/20">
+            <div className="flex items-center gap-3 text-sky-500 font-black text-xs uppercase tracking-widest lg-badge w-fit px-6 py-3 rounded-2xl">
               <ShieldCheck size={18} />
               <span>Certified Medical Supplier</span>
             </div>

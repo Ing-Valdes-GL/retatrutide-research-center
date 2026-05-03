@@ -162,7 +162,7 @@ function ChatContent() {
       <div className="flex-1 min-h-0 flex flex-col">
 
         {/* Top status bar */}
-        <div className="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-3 border-b border-white/5 bg-black/40 backdrop-blur-sm shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-3 border-b border-white/5 lg-surface shrink-0">
           <div className="flex items-center gap-3">
             {/* Agent avatar */}
             <div className="relative">
@@ -180,11 +180,11 @@ function ChatContent() {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden sm:flex items-center gap-1.5 bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 px-3 py-1.5 rounded-full">
+            <div className="hidden sm:flex items-center gap-1.5 lg-badge px-3 py-1.5 rounded-full">
               <Lock size={10} className="text-[#0ea5e9]" />
               <span className="text-[9px] font-black uppercase tracking-widest text-[#0ea5e9]">E2E Encrypted</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/5 border border-white/5 px-3 py-1.5 rounded-full">
+            <div className="flex items-center gap-1.5 lg-surface px-3 py-1.5 rounded-full">
               <Wifi size={10} className="text-white/40" />
               <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Secure</span>
             </div>
@@ -221,7 +221,7 @@ function ChatContent() {
                   <button
                     key={t}
                     onClick={() => setNewMessage(t)}
-                    className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-white/10 text-white/50 hover:border-[#0ea5e9]/50 hover:text-[#0ea5e9] transition-all"
+                    className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider lg-btn text-white/60 hover:text-[#0ea5e9]"
                   >
                     {t}
                   </button>
@@ -316,19 +316,19 @@ function ChatContent() {
         {!atBottom && (
           <button
             onClick={scrollToBottom}
-            className="absolute bottom-24 right-6 w-9 h-9 bg-[#0ea5e9] text-white rounded-full flex items-center justify-center shadow-lg shadow-sky-500/30 hover:scale-110 transition-transform z-20"
+            className="absolute bottom-24 right-6 w-9 h-9 lg-btn-accent text-white rounded-full flex items-center justify-center hover:scale-110 z-20"
           >
             <ChevronDown size={16} />
           </button>
         )}
 
         {/* Input bar */}
-        <div className="shrink-0 px-3 sm:px-6 lg:px-10 py-4 border-t border-white/5 bg-black/60 backdrop-blur-sm">
-          <div className="flex items-end gap-2 bg-white/5 border border-white/8 rounded-2xl p-2 focus-within:border-[#0ea5e9]/40 focus-within:bg-white/8 transition-all">
+        <div className="shrink-0 px-3 sm:px-6 lg:px-10 py-4 border-t border-white/5 lg-surface">
+          <div className="flex items-end gap-2 lg-surface rounded-2xl p-2 focus-within:border-[#0ea5e9]/40 transition-all">
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="w-10 h-10 flex items-center justify-center rounded-xl text-white/40 hover:text-[#0ea5e9] hover:bg-[#0ea5e9]/10 transition-all shrink-0"
+              className="w-10 h-10 flex items-center justify-center rounded-xl text-white/40 hover:text-[#0ea5e9] lg-btn shrink-0"
             >
               {uploading
                 ? <div className="w-4 h-4 border-2 border-[#0ea5e9] border-t-transparent rounded-full animate-spin" />
@@ -358,7 +358,7 @@ function ChatContent() {
             <button
               onClick={sendMessage}
               disabled={!newMessage.trim() || sending}
-              className="w-10 h-10 bg-[#0ea5e9] text-white flex items-center justify-center rounded-xl hover:bg-[#0284c7] active:scale-95 transition-all disabled:opacity-25 disabled:cursor-not-allowed shrink-0"
+              className="w-10 h-10 lg-btn-accent text-white flex items-center justify-center rounded-xl active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed shrink-0"
             >
               {sending
                 ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
