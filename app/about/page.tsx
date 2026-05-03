@@ -32,7 +32,7 @@ export default function AboutPage() {
                "Our mission is to provide the highest purity compounds with absolute transparency. Innovation in healthcare starts with precision in the lab."
              </h2>
              <p className="text-[#0ea5e9] font-bold text-xs uppercase tracking-widest">
-               Allen Bryant <span className="text-gray-400 font-normal ml-2">— Vertex Biolabs</span>
+               Allen Bryant <span className="text-gray-400 font-normal ml-2">— Retatrutide Research Center</span>
              </p>
           </div>
 

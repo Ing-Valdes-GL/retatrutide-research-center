@@ -10,7 +10,7 @@ export default function PrivacyContent() {
         <h2 className="text-2xl font-black text-slate-900 mb-2">Privacy Policy</h2>
         <p className="text-sm text-slate-500">Last updated: April 2, 2026</p>
         <p className="text-sm text-slate-600 mt-4">
-          Vertex Biolabs (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) is committed to protecting your privacy. 
+          Retatrutide Research Center (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) is committed to protecting your privacy. 
           This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website 
           and purchase research compounds. By using our services, you consent to the practices described in this policy.
         </p>
@@ -60,7 +60,7 @@ export default function PrivacyContent() {
             ALL PRODUCTS SOLD BY VERTEX BIOLABS ARE INTENDED EXCLUSIVELY FOR LABORATORY RESEARCH PURPOSES.
           </p>
           <p className="text-sm text-slate-700 leading-relaxed">
-            By purchasing from Vertex Biolabs, you explicitly acknowledge and agree that:
+            By purchasing from Retatrutide Research Center, you explicitly acknowledge and agree that:
           </p>
           <ul className="pl-4 space-y-2 text-sm text-slate-700 leading-relaxed list-disc list-inside">
             <li>All compounds are strictly for in-vitro research and laboratory analysis</li>
@@ -83,7 +83,7 @@ export default function PrivacyContent() {
           <h3 className="text-lg font-bold text-slate-900">4. Age Verification & Eligibility</h3>
         </div>
         <div className="pl-8 space-y-3 text-sm leading-relaxed">
-          <p><strong>Minimum Age:</strong> You must be at least 21 years of age to purchase from Vertex Biolabs. 
+          <p><strong>Minimum Age:</strong> You must be at least 21 years of age to purchase from Retatrutide Research Center. 
           By placing an order, you certify that you meet this age requirement.</p>
           <p><strong>Verification Process:</strong> We employ third-party age verification services and may request 
           government-issued photo identification for high-value orders or restricted compounds.</p>
@@ -135,7 +135,7 @@ export default function PrivacyContent() {
       <section className="space-y-4">
         <h3 className="text-lg font-bold text-slate-900">7. Contact Information</h3>
         <div className="bg-slate-50 rounded-xl p-4 text-sm">
-          <p className="font-semibold text-slate-900">Vertex Biolabs Data Protection Officer</p>
+          <p className="font-semibold text-slate-900">Retatrutide Research Center Data Protection Officer</p>
           <p>Email: privacy@vertexbiolabs.com</p>
           <p>Address: 123 Research Way, Cambridge Science Park, CB4 0GZ, United Kingdom</p>
           <p className="mt-2 text-slate-500">For general inquiries, please use our support chat or email support@vertexbiolabs.com</p>

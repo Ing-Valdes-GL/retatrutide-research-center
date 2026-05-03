@@ -65,16 +65,16 @@ export async function POST(req: Request) {
 
         <p style="margin-top: 40px; font-size: 14px; color: #777;">
           Thanks again! If you need any help with your order, please contact us at <a href="/chat" style="color: #0ea5e9;">support@vertexbiolabs.com</a>.<br>
-          <strong>Vertex Biolabs</strong><br>
+          <strong>Retatrutide Research Center</strong><br>
           United Kingdom (UK).
         </p>
       </div>
     `;
 
     const data = await resend.emails.send({
-      from: 'Vertex Biolabs Orders <contact@support.vertexbiolabs.com>', // Remplace par ton domaine vérifié sur Resend
+      from: 'Retatrutide Research Center Orders <contact@support.vertexbiolabs.com>', // Remplace par ton domaine vérifié sur Resend
       to: [email],
-      subject: `Your Vertex Biolabs Order Receipt #${orderRef}`,
+      subject: `Your Retatrutide Research Center Order Receipt #${orderRef}`,
       html: htmlContent,
     });
 

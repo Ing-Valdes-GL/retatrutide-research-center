@@ -33,7 +33,7 @@ export default function RefundContent() {
         </div>
         <div className="pl-8 space-y-3 text-sm leading-relaxed">
           <p>
-            Vertex Biolabs operates a <strong>strict no-return, no-refund policy</strong> for all research compounds. 
+            Retatrutide Research Center operates a <strong>strict no-return, no-refund policy</strong> for all research compounds. 
             Once an order has been placed and payment processed, it cannot be cancelled, returned, or refunded except 
             under the specific limited circumstances outlined in Section 3 below.
           </p>
@@ -203,7 +203,7 @@ export default function RefundContent() {
             For questions about this policy or to report a damaged/incorrect order, contact us immediately:
           </p>
           <div className="bg-slate-50 rounded-lg p-4">
-            <p className="font-semibold text-slate-900">Vertex Biolabs Customer Resolution</p>
+            <p className="font-semibold text-slate-900">Retatrutide Research Center Customer Resolution</p>
             <p>Email: support@vertexbiolabs.com</p>
             <p>Secure Chat: Available 24/7 via website chat widget</p>
             <p className="text-slate-500 mt-2 text-xs">
@@ -211,7 +211,7 @@ export default function RefundContent() {
             </p>
           </div>
           <p className="text-sm text-slate-600 italic">
-            By placing an order with Vertex Biolabs, you acknowledge that you have read, understood, 
+            By placing an order with Retatrutide Research Center, you acknowledge that you have read, understood, 
             and agree to be bound by this Refund & Return Policy.
           </p>
         </div>
@@ -220,7 +220,7 @@ export default function RefundContent() {
       {/* Footer */}
       <div className="border-t border-slate-200 pt-6 text-xs text-slate-500">
         <p>This Refund Policy is subject to UK Consumer Rights Act 2015 where applicable to consumers. 
-        Business purchasers agree to these terms as part of their supply contract with Vertex Biolabs Ltd.</p>
+        Business purchasers agree to these terms as part of their supply contract with Retatrutide Research Center Ltd.</p>
       </div>
     </div>
   )
