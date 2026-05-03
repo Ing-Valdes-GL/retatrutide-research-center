@@ -1,31 +1,31 @@
 'use client'
 
-import { useEffect, useState, useRef, Suspense } from 'react' // Ajout de Suspense
+import { useEffect, useState, useRef, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase, ChatMessage, ChatConversation } from '@/lib/supabase'
-import { useTheme } from '@/components/ThemeProvider'
 import Header from '@/components/Header'
-import Footer from '@/components/Footer'
-import { Send, Paperclip, Check, CheckCheck, MessageSquare, Shield, Info } from 'lucide-react'
+import {
+  Send, Paperclip, Check, CheckCheck,
+  Shield, Lock, Wifi, ChevronDown, X, ZoomIn
+} from 'lucide-react'
 
-// 1. On déplace toute la logique dans un composant interne
 function ChatContent() {
-  const { theme } = useTheme()
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null)
   const [conversation, setConversation] = useState<ChatConversation | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
+  const [atBottom, setAtBottom] = useState(true)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    checkUser()
-  }, [])
+  useEffect(() => { checkUser() }, [])
 
   useEffect(() => {
     if (user && conversation) {
@@ -36,27 +36,21 @@ function ChatContent() {
   }, [user, conversation])
 
   useEffect(() => {
-    scrollToBottom()
+    if (atBottom) scrollToBottom()
   }, [messages])
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      router.push('/login')
-    } else {
-      setUser(user)
-      await loadOrCreateConversation(user.id)
-    }
+    const { data: { user: u } } = await supabase.auth.getUser()
+    if (!u) { router.push('/login'); return }
+    setUser(u)
+    await loadOrCreateConversation(u.id)
   }
 
   const loadOrCreateConversation = async (userId: string) => {
     try {
       const { data: existing } = await supabase
-        .from('chat_conversations')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .maybeSingle()
+        .from('chat_conversations').select('*')
+        .eq('user_id', userId).eq('status', 'active').maybeSingle()
 
       if (existing) {
         setConversation(existing)
@@ -68,8 +62,8 @@ function ChatContent() {
         if (error) throw error
         setConversation(newConv)
       }
-    } catch (error) {
-      console.error('Erreur conversation:', error)
+    } catch (e) {
+      console.error(e)
     } finally {
       setLoading(false)
     }
@@ -78,8 +72,7 @@ function ChatContent() {
   const loadMessages = async () => {
     if (!conversation) return
     const { data } = await supabase
-      .from('chat_messages')
-      .select('*')
+      .from('chat_messages').select('*')
       .eq('conversation_id', conversation.id)
       .order('created_at', { ascending: true })
     setMessages(data || [])
@@ -87,203 +80,332 @@ function ChatContent() {
 
   const subscribeToRealtime = () => {
     const channel = supabase.channel(`chat:${conversation?.id}`)
-    
-    channel
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'chat_messages', 
-        filter: `conversation_id=eq.${conversation?.id}` 
-      }, (payload) => {
-        const newMsg = payload.new as ChatMessage
-        setMessages((current) => {
-          const exists = current.some(m => m.id === newMsg.id)
-          return exists ? current : [...current, newMsg]
-        })
-      })
-      .subscribe()
-
+    channel.on('postgres_changes', {
+      event: 'INSERT', schema: 'public',
+      table: 'chat_messages',
+      filter: `conversation_id=eq.${conversation?.id}`
+    }, (payload) => {
+      const msg = payload.new as ChatMessage
+      setMessages((cur) => cur.some(m => m.id === msg.id) ? cur : [...cur, msg])
+    }).subscribe()
     return channel
   }
 
   const sendMessage = async () => {
     if (!newMessage.trim() || !user || !conversation || sending) return
-
     const content = newMessage
     setNewMessage('')
     setSending(true)
-
     try {
       const { error } = await supabase.from('chat_messages').insert({
         conversation_id: conversation.id,
         sender_id: user.id,
         message_type: 'text',
-        content: content
+        content
       })
-
       if (error) throw error
-
       await supabase.from('chat_conversations')
         .update({ last_message_at: new Date().toISOString() })
         .eq('id', conversation.id)
-
-    } catch (error: any) {
-      console.error("Failed to send:", error)
+    } catch (e) {
+      console.error(e)
       setNewMessage(content)
     } finally {
       setSending(false)
     }
   }
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
     if (!file || !user || !conversation) return
     setUploading(true)
     try {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`
-      
+      const ext = file.name.split('.').pop()
+      const fileName = `${user.id}/${Date.now()}.${ext}`
       const { error: upErr } = await supabase.storage.from('chat-images').upload(fileName, file)
       if (upErr) throw upErr
-
       const { data: { publicUrl } } = supabase.storage.from('chat-images').getPublicUrl(fileName)
-      
       await supabase.from('chat_messages').insert({
-        conversation_id: conversation.id,
-        sender_id: user.id,
-        message_type: 'image',
-        file_url: publicUrl,
-        content: 'Image attachment'
+        conversation_id: conversation.id, sender_id: user.id,
+        message_type: 'image', file_url: publicUrl, content: 'Image attachment'
       })
-    } catch (e) {
-      alert("Upload failed")
+    } catch {
+      alert('Upload failed')
     } finally {
       setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
-  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  const scrollToBottom = () =>
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+
+  const handleScroll = () => {
+    const el = scrollAreaRef.current
+    if (!el) return
+    setAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 60)
+  }
+
+  const groupedMessages = messages.reduce<Array<{ date: string; msgs: ChatMessage[] }>>((acc, msg) => {
+    const date = new Date(msg.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+    const last = acc[acc.length - 1]
+    if (last && last.date === date) { last.msgs.push(msg) }
+    else { acc.push({ date, msgs: [msg] }) }
+    return acc
+  }, [])
 
   return (
-    <div className={`min-h-screen flex flex-col ${theme === 'dark' ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'}`}>
+    <div className="h-screen flex flex-col bg-[#050505] text-white overflow-hidden">
       <Header />
 
-      <main className="flex-1 container mx-auto max-w-5xl px-4 py-8 flex flex-col min-h-0">
-        <div className="flex items-center justify-between mb-6 px-2">
-            <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[#1e3a8a] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                    <MessageSquare size={24} />
-                </div>
-                <div>
-                    <h1 className="text-2xl font-black tracking-tighter uppercase leading-none">Secure <span className="text-[#0ea5e9] italic">Channel</span></h1>
-                    <div className="flex items-center gap-2 mt-1">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Support Protocol Active</span>
-                    </div>
-                </div>
-            </div>
-            <div className="hidden md:flex items-center gap-2 bg-[#1e3a8a]/10 px-4 py-2 rounded-full border border-[#1e3a8a]/20">
-                <Shield size={14} className="text-[#0ea5e9]" />
-                <span className="text-[9px] font-black uppercase tracking-tighter text-[#1e3a8a]">End-to-End Encrypted</span>
-            </div>
-        </div>
+      {/* ── CHAT SHELL ── */}
+      <div className="flex-1 min-h-0 flex flex-col">
 
-        <div className={`flex-1 overflow-hidden flex flex-col rounded-[2.5rem] border ${theme === 'dark' ? 'bg-gray-900/40 border-white/5' : 'bg-white border-gray-200 shadow-xl'}`}>
-          <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 scrollbar-hide">
-            {loading ? (
-                <div className="h-full flex items-center justify-center">
-                    <div className="w-10 h-10 border-4 border-[#1e3a8a] border-t-transparent rounded-full animate-spin"></div>
-                </div>
-            ) : messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center opacity-30">
-                    <Info size={48} className="mb-4" />
-                    <p className="font-black uppercase tracking-[0.2em] text-sm">System Ready</p>
-                    <p className="text-xs max-w-[200px] mt-2">Transmit your order reference or inquiries below.</p>
-                </div>
-            ) : (
-              messages.map((msg) => {
-                const isOwn = msg.sender_id === user?.id
-                return (
-                  <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
-                    <div className={`max-w-[85%] md:max-w-[70%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
-                      <div className={`px-6 py-4 rounded-[1.8rem] text-sm font-medium shadow-sm ${
-                        isOwn 
-                          ? 'bg-[#0ea5e9] text-white rounded-tr-none' 
-                          : theme === 'dark' ? 'bg-white/5 text-white rounded-tl-none border border-white/5' : 'bg-gray-100 text-gray-800 rounded-tl-none'
-                      }`}>
-                        {msg.message_type === 'text' && <p className="leading-relaxed">{msg.content}</p>}
-                        {msg.message_type === 'image' && msg.file_url && (
-                            <img
-                              src={msg.file_url}
-                              alt="Attachment"
-                              className="rounded-2xl max-h-64 object-cover cursor-pointer"
-                              onClick={() => msg.file_url && window.open(msg.file_url, '_blank')}
-                            />
-                        )}
-                      </div>
-                      <div className={`flex items-center gap-2 mt-2 px-1 ${isOwn ? 'flex-row' : 'flex-row-reverse'}`}>
-                        <span className="text-[10px] font-black uppercase opacity-30">
-                            {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        {isOwn && (
-                            <div className="opacity-40">
-                                {msg.is_read ? <CheckCheck size={12} className="text-[#0ea5e9]" /> : <Check size={12} />}
-                            </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })
-            )}
-            <div ref={messagesEndRef} />
+        {/* Top status bar */}
+        <div className="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-3 border-b border-white/5 bg-black/40 backdrop-blur-sm shrink-0">
+          <div className="flex items-center gap-3">
+            {/* Agent avatar */}
+            <div className="relative">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#0ea5e9] to-[#1e3a8a] flex items-center justify-center text-white font-black text-xs shrink-0">
+                RRC
+              </div>
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#050505]" />
+            </div>
+            <div>
+              <p className="font-black text-xs sm:text-sm uppercase tracking-tight leading-none">Support Team</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/80">Online · Avg reply &lt; 2min</span>
+              </div>
+            </div>
           </div>
-
-          <div className={`p-4 md:p-6 border-t ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'border-gray-100 bg-gray-50/50'}`}>
-            <div className="flex items-center gap-3 bg-white dark:bg-gray-800 p-2 rounded-[2rem] shadow-inner border border-black/5 dark:border-white/5 focus-within:ring-2 ring-blue-500/20 transition-all">
-              <button 
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-[#0ea5e9]"
-              >
-                {uploading ? <div className="w-4 h-4 border-2 border-[#0ea5e9] border-t-transparent rounded-full animate-spin"></div> : <Paperclip size={20} />}
-              </button>
-              
-              <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
-
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder="Secure transmission..."
-                className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-bold uppercase tracking-wider placeholder:opacity-30"
-              />
-
-              <button
-                onClick={sendMessage}
-                disabled={!newMessage.trim() || sending}
-                className="w-12 h-12 bg-[#0ea5e9] text-white flex items-center justify-center rounded-full hover:scale-105 active:scale-95 transition-all disabled:opacity-20 shadow-lg shadow-sky-500/30"
-              >
-                <Send size={18} />
-              </button>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden sm:flex items-center gap-1.5 bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 px-3 py-1.5 rounded-full">
+              <Lock size={10} className="text-[#0ea5e9]" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-[#0ea5e9]">E2E Encrypted</span>
             </div>
-            <p className="text-center text-[9px] font-black uppercase tracking-[0.2em] opacity-20 mt-4">
-                Transmission encrypted via Retatrutide Research Center v3.4
-            </p>
+            <div className="flex items-center gap-1.5 bg-white/5 border border-white/5 px-3 py-1.5 rounded-full">
+              <Wifi size={10} className="text-white/40" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Secure</span>
+            </div>
           </div>
         </div>
-      </main>
 
-      <Footer />
+        {/* Messages area */}
+        <div
+          ref={scrollAreaRef}
+          onScroll={handleScroll}
+          className="flex-1 min-h-0 overflow-y-auto px-3 sm:px-6 lg:px-10 py-6 space-y-6"
+          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(14,165,233,0.2) transparent' }}
+        >
+          {loading ? (
+            <div className="h-full flex flex-col items-center justify-center gap-4">
+              <div className="w-10 h-10 border-2 border-[#0ea5e9] border-t-transparent rounded-full animate-spin" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Initializing secure channel…</p>
+            </div>
+
+          ) : messages.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center px-4 gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0ea5e9]/20 to-[#1e3a8a]/20 border border-[#0ea5e9]/20 flex items-center justify-center">
+                <Shield size={28} className="text-[#0ea5e9]" />
+              </div>
+              <div>
+                <p className="font-black text-base uppercase tracking-tight text-white mb-2">Secure Channel Ready</p>
+                <p className="text-xs text-white/40 max-w-xs leading-relaxed">
+                  Send your order reference or any inquiry. Our team will respond within minutes.
+                </p>
+              </div>
+              {/* Quick prompt chips */}
+              <div className="flex flex-wrap justify-center gap-2 max-w-sm">
+                {['Track my order', 'Shipping info', 'Product query', 'Payment issue'].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setNewMessage(t)}
+                    className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-white/10 text-white/50 hover:border-[#0ea5e9]/50 hover:text-[#0ea5e9] transition-all"
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          ) : (
+            groupedMessages.map(({ date, msgs }) => (
+              <div key={date}>
+                {/* Date divider */}
+                <div className="flex items-center gap-3 my-4">
+                  <div className="flex-1 h-px bg-white/5" />
+                  <span className="text-[9px] font-black uppercase tracking-widest text-white/20 px-2">{date}</span>
+                  <div className="flex-1 h-px bg-white/5" />
+                </div>
+
+                <div className="space-y-3">
+                  {msgs.map((msg, i) => {
+                    const isOwn = msg.sender_id === user?.id
+                    const prevSame = i > 0 && msgs[i - 1].sender_id === msg.sender_id
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`flex gap-2.5 ${isOwn ? 'flex-row-reverse' : 'flex-row'} ${prevSame ? 'mt-1' : 'mt-3'}`}
+                        style={{ animationDelay: `${i * 30}ms` }}
+                      >
+                        {/* Avatar (only on first in run) */}
+                        <div className="w-7 h-7 shrink-0 self-end">
+                          {!prevSame && (
+                            isOwn ? (
+                              <div className="w-7 h-7 rounded-full bg-[#0ea5e9]/20 border border-[#0ea5e9]/30 flex items-center justify-center text-[8px] font-black text-[#0ea5e9] uppercase">
+                                {user?.email?.[0] ?? 'U'}
+                              </div>
+                            ) : (
+                              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#0ea5e9] to-[#1e3a8a] flex items-center justify-center text-[7px] font-black text-white">
+                                RRC
+                              </div>
+                            )
+                          )}
+                        </div>
+
+                        {/* Bubble */}
+                        <div className={`flex flex-col max-w-[75%] sm:max-w-[65%] ${isOwn ? 'items-end' : 'items-start'}`}>
+                          <div className={`relative px-4 py-3 text-sm leading-relaxed break-words ${
+                            isOwn
+                              ? 'bg-gradient-to-br from-[#0ea5e9] to-[#0284c7] text-white rounded-2xl rounded-tr-sm shadow-lg shadow-sky-500/10'
+                              : 'bg-white/5 border border-white/8 text-white/90 rounded-2xl rounded-tl-sm'
+                          }`}>
+                            {msg.message_type === 'text' && (
+                              <p>{msg.content}</p>
+                            )}
+                            {msg.message_type === 'image' && msg.file_url && (
+                              <button
+                                onClick={() => setLightboxUrl(msg.file_url ?? null)}
+                                className="relative group block"
+                              >
+                                <img
+                                  src={msg.file_url}
+                                  alt="Attachment"
+                                  className="rounded-xl max-h-56 object-cover w-full"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
+                                  <ZoomIn size={20} className="text-white" />
+                                </div>
+                              </button>
+                            )}
+                          </div>
+                          {/* Meta */}
+                          <div className={`flex items-center gap-1.5 mt-1 px-1 ${isOwn ? 'flex-row' : 'flex-row-reverse'}`}>
+                            <span className="text-[9px] text-white/25 font-bold tabular-nums">
+                              {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                            {isOwn && (
+                              msg.is_read
+                                ? <CheckCheck size={11} className="text-[#0ea5e9]" />
+                                : <Check size={11} className="text-white/30" />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Scroll-to-bottom fab */}
+        {!atBottom && (
+          <button
+            onClick={scrollToBottom}
+            className="absolute bottom-24 right-6 w-9 h-9 bg-[#0ea5e9] text-white rounded-full flex items-center justify-center shadow-lg shadow-sky-500/30 hover:scale-110 transition-transform z-20"
+          >
+            <ChevronDown size={16} />
+          </button>
+        )}
+
+        {/* Input bar */}
+        <div className="shrink-0 px-3 sm:px-6 lg:px-10 py-4 border-t border-white/5 bg-black/60 backdrop-blur-sm">
+          <div className="flex items-end gap-2 bg-white/5 border border-white/8 rounded-2xl p-2 focus-within:border-[#0ea5e9]/40 focus-within:bg-white/8 transition-all">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="w-10 h-10 flex items-center justify-center rounded-xl text-white/40 hover:text-[#0ea5e9] hover:bg-[#0ea5e9]/10 transition-all shrink-0"
+            >
+              {uploading
+                ? <div className="w-4 h-4 border-2 border-[#0ea5e9] border-t-transparent rounded-full animate-spin" />
+                : <Paperclip size={18} />}
+            </button>
+
+            <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
+
+            <textarea
+              rows={1}
+              value={newMessage}
+              onChange={(e) => {
+                setNewMessage(e.target.value)
+                e.target.style.height = 'auto'
+                e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  sendMessage()
+                }
+              }}
+              placeholder="Type a message… (Enter to send)"
+              className="flex-1 bg-transparent border-none focus:ring-0 outline-none resize-none text-sm text-white placeholder:text-white/25 py-2 px-1 min-h-[40px] max-h-[120px] leading-relaxed"
+            />
+
+            <button
+              onClick={sendMessage}
+              disabled={!newMessage.trim() || sending}
+              className="w-10 h-10 bg-[#0ea5e9] text-white flex items-center justify-center rounded-xl hover:bg-[#0284c7] active:scale-95 transition-all disabled:opacity-25 disabled:cursor-not-allowed shrink-0"
+            >
+              {sending
+                ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                : <Send size={16} />}
+            </button>
+          </div>
+
+          <p className="text-center text-[8px] font-bold uppercase tracking-[0.25em] text-white/15 mt-2">
+            Transmission encrypted · Retatrutide Research Center v3.4
+          </p>
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      {lightboxUrl && (
+        <div
+          className="fixed inset-0 z-[500] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm"
+          onClick={() => setLightboxUrl(null)}
+        >
+          <button
+            className="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+            onClick={() => setLightboxUrl(null)}
+          >
+            <X size={18} />
+          </button>
+          <img
+            src={lightboxUrl}
+            alt="Full size"
+            className="max-w-full max-h-[90vh] rounded-2xl object-contain shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   )
 }
 
-// 2. Export par défaut avec Suspense
 export default function ChatPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center italic text-[#0ea5e9] uppercase text-xs tracking-widest">Initializing Secure Channel...</div>}>
+    <Suspense fallback={
+      <div className="h-screen bg-[#050505] flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-2 border-[#0ea5e9] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-widest text-[#0ea5e9]/60">
+          Initializing Secure Channel…
+        </p>
+      </div>
+    }>
       <ChatContent />
     </Suspense>
   )
