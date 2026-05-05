@@ -4,15 +4,13 @@ import React, { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  ShoppingCart, Sun, Moon, Menu, X,
+  ShoppingCart,
   Home, Package, MessageCircle, ShieldCheck, ClipboardList
 } from 'lucide-react'
-import { useTheme } from './ThemeProvider'
 import { supabase } from '@/lib/supabase'
 import BrandLogo from './BrandLogo'
 
 export default function Header() {
-  const { theme, toggleTheme } = useTheme()
   const pathname = usePathname()
   const [isAdmin, setIsAdmin] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -152,14 +150,6 @@ export default function Header() {
                 )}
               </Link>
             </div>
-
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-3 rounded-xl lg-btn text-sky-400"
-            >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
 
             {/* Hamburger */}
             <button
