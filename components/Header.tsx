@@ -84,13 +84,18 @@ export default function Header() {
         style={
           scrolled
             ? {
-                background: 'rgba(5,5,5,0.65)',
+                background: 'rgba(4,4,12,0.82)',
                 backdropFilter: 'blur(28px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(28px) saturate(180%)',
                 borderBottom: '1px solid rgba(255,255,255,0.07)',
                 boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.04), 0 8px 32px rgba(0,0,0,0.32)',
               }
-            : { background: 'transparent' }
+            : {
+                background: 'rgba(4,4,12,0.52)',
+                backdropFilter: 'blur(20px) saturate(160%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+                borderBottom: '1px solid rgba(255,255,255,0.04)',
+              }
         }
       >
         <div className="container mx-auto px-4 h-20 flex items-center justify-between">
