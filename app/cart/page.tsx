@@ -72,60 +72,62 @@ export default function CartPage() {
   }
 
   return (
-    <div className="bg-white min-h-screen text-slate-800 font-sans">
+    <div className="bg-[#050505] min-h-screen text-white font-sans">
       <Header />
 
-      {/* Hero Header - Design épuré */}
-      <div className="bg-[#FFFBF7] py-16 text-center border-b border-orange-50/50">
-        <h1 className="text-4xl font-bold tracking-tight text-slate-900">Your Cart</h1>
-        <p className="text-slate-500 text-sm mt-2 font-medium">Review your items before secure checkout</p>
+      {/* Hero Header */}
+      <div className="py-16 text-center border-b border-white/5 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        <h1 className="text-4xl font-bold tracking-tight text-white relative z-10">Your Cart</h1>
+        <p className="text-white/40 text-sm mt-2 font-medium relative z-10">Review your items before secure checkout</p>
       </div>
 
       <main className="container mx-auto px-6 py-12">
         <div className="grid lg:grid-cols-3 gap-12">
-          
-          {/* COLONNE GAUCHE : LISTE PRODUITS & SHIPPING */}
+
+          {/* LEFT: Products + Shipping */}
           <div className="lg:col-span-2 space-y-12">
-            
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-100 text-left">
-                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-slate-400">Product</th>
-                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-slate-400">Price</th>
-                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-slate-400 text-center">Quantity</th>
-                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-slate-400">Subtotal</th>
+                  <tr className="border-b border-white/5 text-left">
+                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-white/30">Product</th>
+                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-white/30">Price</th>
+                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-white/30 text-center">Quantity</th>
+                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-white/30">Subtotal</th>
                     <th className="pb-4"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-white/5">
                   {cartItems.map((item) => (
                     <tr key={item.id} className="group">
                       <td className="py-6 flex items-center gap-4">
-                        <div className="w-16 h-16 bg-slate-50 rounded-lg p-1 flex items-center justify-center border border-slate-100">
-                          <img 
-                            src={item.image_url || item.main_image_url} 
-                            className="max-h-full max-w-full object-contain" 
-                            alt={item.name} 
+                        <div className="w-16 h-16 bg-white/5 rounded-lg p-1 flex items-center justify-center border border-white/8">
+                          <img
+                            src={item.image_url || item.main_image_url}
+                            className="max-h-full max-w-full object-contain"
+                            alt={item.name}
                           />
                         </div>
-                        <span className="font-medium text-slate-900 text-sm">{item.name}</span>
+                        <span className="font-medium text-white text-sm">{item.name}</span>
                       </td>
-                      <td className="py-6 text-sm text-slate-500 font-medium">£{item.price.toFixed(2)}</td>
+                      <td className="py-6 text-sm text-white/50 font-medium">£{item.price.toFixed(2)}</td>
                       <td className="py-6">
-                        <div className="flex items-center justify-between bg-slate-50 rounded-md px-2 py-1.5 w-24 mx-auto border border-slate-200/50">
-                          <button onClick={() => updateQuantity(item.id, -1)} className="text-slate-400 hover:text-orange-500 transition-colors">
+                        <div className="flex items-center justify-between lg-surface rounded-md px-2 py-1.5 w-24 mx-auto">
+                          <button onClick={() => updateQuantity(item.id, -1)} className="text-white/40 hover:text-[#0ea5e9] transition-colors">
                             <Minus size={14}/>
                           </button>
-                          <span className="text-sm font-semibold text-slate-700">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, 1)} className="text-slate-400 hover:text-orange-500 transition-colors">
+                          <span className="text-sm font-semibold text-white">{item.quantity}</span>
+                          <button onClick={() => updateQuantity(item.id, 1)} className="text-white/40 hover:text-[#0ea5e9] transition-colors">
                             <Plus size={14}/>
                           </button>
                         </div>
                       </td>
-                      <td className="py-6 font-bold text-sm text-slate-900">£{(item.price * item.quantity).toFixed(2)}</td>
+                      <td className="py-6 font-bold text-sm text-white">£{(item.price * item.quantity).toFixed(2)}</td>
                       <td className="py-6 text-right">
-                        <button onClick={() => removeItem(item.id)} className="text-slate-300 hover:text-red-400 transition-colors">
+                        <button onClick={() => removeItem(item.id)} className="text-white/20 hover:text-red-400 transition-colors">
                           <Trash2 size={16} />
                         </button>
                       </td>
@@ -134,47 +136,41 @@ export default function CartPage() {
                 </tbody>
               </table>
               {cartItems.length === 0 && (
-                <div className="py-12 text-center text-slate-400 text-sm italic">
+                <div className="py-12 text-center text-white/30 text-sm italic">
                   Your cart is currently empty.
                 </div>
               )}
             </div>
 
-            {/* SECTION SHIPPING INFORMATION */}
-            <div className="pt-8 border-t border-slate-100">
-              <h3 className="text-lg font-bold mb-6 text-slate-900">Shipping Information</h3>
+            {/* SHIPPING */}
+            <div className="pt-8 border-t border-white/5">
+              <h3 className="text-lg font-bold mb-6 text-white">Shipping Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                   <select 
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-orange-200 transition-all appearance-none text-slate-600"
+                   <select
+                    className="w-full lg-surface text-white rounded-lg px-4 py-3 text-sm outline-none focus:border-[#0ea5e9]/50 transition-all appearance-none"
                     value={shippingInfo.country}
                     onChange={(e) => setShippingInfo({...shippingInfo, country: e.target.value})}
                    >
-                     <option>United Kingdom (UK)</option>
-                     <option>United States (US)</option>
-                     <option>France</option>
+                     <option className="bg-[#0a0a0f]">United Kingdom (UK)</option>
+                     <option className="bg-[#0a0a0f]">United States (US)</option>
+                     <option className="bg-[#0a0a0f]">France</option>
                    </select>
                 </div>
-                <input 
-                  type="text" placeholder="County" 
-                  className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-orange-200"
+                <input type="text" placeholder="County"
+                  className="lg-surface text-white rounded-lg px-4 py-3 text-sm outline-none placeholder:text-white/25 focus:border-[#0ea5e9]/50"
                   value={shippingInfo.county}
-                  onChange={(e) => setShippingInfo({...shippingInfo, county: e.target.value})}
-                />
-                <input 
-                  type="text" placeholder="Town / City" 
-                  className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-orange-200"
+                  onChange={(e) => setShippingInfo({...shippingInfo, county: e.target.value})} />
+                <input type="text" placeholder="Town / City"
+                  className="lg-surface text-white rounded-lg px-4 py-3 text-sm outline-none placeholder:text-white/25 focus:border-[#0ea5e9]/50"
                   value={shippingInfo.townCity}
-                  onChange={(e) => setShippingInfo({...shippingInfo, townCity: e.target.value})}
-                />
-                <input 
-                  type="text" placeholder="Postcode" 
-                  className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-orange-200"
+                  onChange={(e) => setShippingInfo({...shippingInfo, townCity: e.target.value})} />
+                <input type="text" placeholder="Postcode"
+                  className="lg-surface text-white rounded-lg px-4 py-3 text-sm outline-none placeholder:text-white/25 focus:border-[#0ea5e9]/50"
                   value={shippingInfo.postcode}
-                  onChange={(e) => setShippingInfo({...shippingInfo, postcode: e.target.value})}
-                />
+                  onChange={(e) => setShippingInfo({...shippingInfo, postcode: e.target.value})} />
                 <div className="flex items-center">
-                  <button className="bg-orange-400 text-white px-8 py-3 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-orange-500 transition-all shadow-sm">
+                  <button className="lg-btn-accent px-8 py-3 rounded-lg font-bold text-xs uppercase tracking-widest text-white">
                     Update Shipping
                   </button>
                 </div>

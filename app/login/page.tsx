@@ -4,11 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { useTheme } from '@/components/ThemeProvider'
-import { ArrowLeft, Loader2, Hash } from 'lucide-react'
+import { ArrowLeft, Loader2, Lock, Mail } from 'lucide-react'
 
 export default function LoginPage() {
-  const { theme } = useTheme()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
@@ -19,104 +17,99 @@ export default function LoginPage() {
     try {
       setLoading(true)
       setMessage({ type: '', text: '' })
-      
       const { error } = await supabase.auth.signInWithOtp({
-        email: email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/orders`,
-        }
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/orders` }
       })
-
       if (error) throw error
       setMessage({ type: 'success', text: 'Access link transmitted. Check your inbox.' })
-    } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || 'Transmission failed.' })
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Transmission failed.'
+      setMessage({ type: 'error', text: msg })
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className={`min-h-screen flex flex-col p-8 md:p-12 ${theme === 'dark' ? 'bg-[#0A0A0A] text-white' : 'bg-white text-slate-900'} font-mono`}>
-      
-      {/* Top Navigation */}
-      <Link 
-        href="/" 
-        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity mb-24"
-      >
-        <ArrowLeft size={14} />
-        <span>Exit Terminal</span>
-      </Link>
+    <div className="min-h-screen flex flex-col bg-[#050505] text-white font-mono relative overflow-hidden">
 
-      <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-4 leading-none">
-            User <span className="text-[#FFA52F]">Access</span>
-          </h1>
-          <p className="text-[10px] font-black uppercase tracking-widest opacity-30 leading-relaxed">
-            Authentication required to initialize user session.
-          </p>
-        </div>
+      {/* Background glow */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#0ea5e9]/8 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute inset-0 opacity-[0.03]"
+        style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-        {/* Status Message */}
-        {message.text && (
-          <div className={`mb-8 text-[10px] font-black uppercase tracking-widest p-4 border ${
-            message.type === 'error' ? 'border-red-500/50 text-red-500' : 'border-[#FFA52F]/50 text-[#FFA52F]'
-          }`}>
-            {message.type === 'error' ? '>> ERROR: ' : '>> SUCCESS: '} {message.text}
-          </div>
-        )}
+      {/* Back link */}
+      <div className="relative z-10 p-8 md:p-12">
+        <Link href="/"
+          className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-white/80 transition-colors">
+          <ArrowLeft size={14} /> Exit Terminal
+        </Link>
+      </div>
 
-        {/* Simplified Form */}
-        <form onSubmit={handleLogin} className="space-y-8">
-          <div className="space-y-2">
-            <label className="text-[9px] font-black uppercase tracking-[0.3em] opacity-30 ml-1">Identify via Email</label>
-            <input 
-              type="email"
-              required
-              placeholder="USER@VERTEXBIOLABS.COM"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={`w-full bg-transparent border-b-2 py-4 text-sm font-bold outline-none transition-all uppercase placeholder:opacity-10 ${
-                theme === 'dark' ? 'border-white/10 focus:border-[#FFD363]' : 'border-slate-200 focus:border-[#FFA52F]'
-              }`}
-            />
+      {/* Form */}
+      <div className="flex-1 flex items-center justify-center px-6 relative z-10">
+        <div className="w-full max-w-sm">
+
+          {/* Icon */}
+          <div className="flex justify-center mb-8">
+            <div className="w-16 h-16 lg-badge rounded-2xl flex items-center justify-center">
+              <Lock size={28} className="text-[#0ea5e9]" />
+            </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full flex items-center justify-between px-8 py-5 rounded-none font-black uppercase text-[11px] tracking-[0.3em] transition-all shadow-xl active:scale-95
-              ${theme === 'dark' 
-                ? 'bg-[#FFA52F] text-black hover:bg-[#FFD363]' 
-                : 'bg-slate-900 text-white hover:bg-[#FFA52F]'}`}
-          >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-            ) : (
-              <>
-                <span>Request Code</span>
-                <Hash size={16} className="opacity-50" />
-              </>
+          <div className="text-center mb-10">
+            <p className="text-[10px] uppercase tracking-[0.4em] text-[#0ea5e9] font-black mb-3">Secure Access</p>
+            <h1 className="text-3xl font-black tracking-tighter leading-none">SIGN IN</h1>
+            <p className="text-white/30 text-xs mt-3 leading-relaxed">Enter your email to receive a magic link.</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="relative">
+              <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full pl-12 pr-4 py-4 rounded-xl lg-surface text-sm text-white placeholder:text-white/25 outline-none focus:border-[#0ea5e9]/50 transition-all"
+              />
+            </div>
+
+            {message.text && (
+              <div className={`p-4 rounded-xl text-xs font-bold uppercase tracking-wider ${
+                message.type === 'success'
+                  ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                  : 'bg-red-500/10 border border-red-500/20 text-red-400'
+              }`}>
+                {message.text}
+              </div>
             )}
-          </button>
-        </form>
 
-        {/* Footer Info */}
-        <div className="mt-24 space-y-4">
-          <div className={`h-[1px] w-12 ${theme === 'dark' ? 'bg-[#FFA52F]/30' : 'bg-slate-200'}`} />
-          <p className="text-[9px] font-black uppercase tracking-widest opacity-20 leading-loose">
-            Secure link protocol v2.4 <br />
-            System Status: Operational
-          </p>
+            <button type="submit" disabled={loading}
+              className="w-full py-4 rounded-xl font-black uppercase text-sm tracking-widest text-white lg-btn-accent flex items-center justify-center gap-3 disabled:opacity-40">
+              {loading ? <Loader2 size={18} className="animate-spin" /> : <Lock size={16} />}
+              {loading ? 'Transmitting…' : 'Send Access Link'}
+            </button>
+          </form>
+
+          <div className="flex items-center gap-4 my-8">
+            <div className="flex-1 h-px bg-white/8" />
+            <span className="text-[10px] text-white/20 uppercase tracking-widest font-bold">or</span>
+            <div className="flex-1 h-px bg-white/8" />
+          </div>
+
+          <Link href="/products"
+            className="block w-full py-4 rounded-xl font-black uppercase text-[11px] tracking-widest text-center text-white/50 lg-btn hover:text-white">
+            Browse Without Account
+          </Link>
         </div>
       </div>
 
-      {/* Decorative side text */}
-      <div className={`fixed bottom-12 right-12 text-[10px] font-black opacity-5 rotate-90 origin-right uppercase tracking-[0.5em] pointer-events-none hidden md:block`}>
-        Identity_Verification_Portal
-      </div>
+      <p className="relative z-10 text-center text-[9px] text-white/15 font-bold uppercase tracking-[0.2em] pb-8">
+        Retatrutide Research Center · Secure Terminal v3.4
+      </p>
     </div>
   )
 }

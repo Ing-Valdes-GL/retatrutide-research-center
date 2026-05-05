@@ -72,7 +72,7 @@ export default function Header() {
   })
 
   return (
-    <div className="bg-white min-h-screen flex flex-col">
+    <div className="bg-[#050505] min-h-screen flex flex-col text-white">
       
       {/* POPUP SUCCÈS */}
       <AnimatePresence>
@@ -97,15 +97,15 @@ export default function Header() {
         </div>
       </div>
 
-      <header className="bg-white relative z-[90] border-b border-gray-100">
+      <header className="relative z-[90] border-b border-white/5 lg-surface">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between gap-8">
-          <Link href="/"><img src="/favicon.ico" alt="Retatrutide Research Center" className="h-10 md:h-12" /></Link>
+          <Link href="/"><img src="/favicon.ico" alt="Retatrutide Research Center" className="h-10 md:h-12 opacity-80" /></Link>
           <div className="hidden md:flex flex-grow max-w-2xl items-center gap-3">
-            <form onSubmit={handleSearchSubmit} className="flex-grow flex border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-              <input type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} placeholder="Search a product..." className="flex-grow px-6 py-2.5 text-sm outline-none" />
-              <button type="submit" className="bg-black text-white px-6"><Search size={18} /></button>
+            <form onSubmit={handleSearchSubmit} className="flex-grow flex lg-surface rounded-lg overflow-hidden">
+              <input type="text" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} placeholder="Search a product..." className="flex-grow px-6 py-2.5 text-sm outline-none bg-transparent text-white placeholder:text-white/30" />
+              <button type="submit" className="bg-[#0ea5e9] text-white px-6 hover:bg-[#0284c7] transition-colors"><Search size={18} /></button>
             </form>
-            <button onClick={() => setFilterPromo(!filterPromo)} className={`flex items-center gap-2 px-5 py-2.5 rounded-lg border text-[10px] font-black uppercase ${filterPromo ? 'bg-[#0ea5e9] text-white' : 'text-gray-400'}`}>
+            <button onClick={() => setFilterPromo(!filterPromo)} className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all ${filterPromo ? 'lg-btn-accent text-white' : 'lg-btn text-white/50 hover:text-white'}`}>
               <Percent size={14} /> {filterPromo ? 'Promos Only' : 'Everything'}
             </button>
           </div>
@@ -137,10 +137,10 @@ export default function Header() {
       </header>
 
       {/* CONTENU PRINCIPAL (LA LISTE DE PRODUITS) */}
-      <main className="container mx-auto px-4 py-16 bg-white flex-grow">
+      <main className="container mx-auto px-4 py-16 flex-grow">
         <div className="flex flex-col items-center mb-12">
-            <span className="bg-black text-white px-4 py-1 text-[10px] font-black uppercase tracking-[0.3em] mb-4">Collection</span>
-            <h2 className="text-3xl md:text-4xl font-black text-center uppercase text-gray-900">
+            <span className="lg-badge text-[#0ea5e9] px-4 py-1 text-[10px] font-black uppercase tracking-[0.3em] mb-4 rounded-full">Collection</span>
+            <h2 className="text-3xl md:text-4xl font-black text-center uppercase text-white">
               {filterPromo ? 'Exclusive Deals' : 'Best Selling Products'}
             </h2>
         </div>
@@ -152,10 +152,10 @@ export default function Header() {
               layout 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all group flex flex-col overflow-hidden"
+              className="lg-card rounded-2xl transition-all group flex flex-col overflow-hidden"
             >
               {/* IMAGE CLIQUABLE VERS DÉTAILS */}
-              <Link href={`/products/${product.id}`} className="relative aspect-square overflow-hidden bg-[#F9F9F9] flex items-center justify-center p-6 cursor-pointer">
+              <Link href={`/products/${product.id}`} className="relative aspect-square overflow-hidden bg-white/3 flex items-center justify-center p-6 cursor-pointer border-b border-white/5">
                 {product.on_sale && (
                   <div className="absolute top-4 right-4 bg-red-500 text-white text-[9px] font-black px-2 py-1 rounded-md z-10">PROMO</div>
                 )}
@@ -165,7 +165,7 @@ export default function Header() {
                   alt={product.name}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center">
-                  <span className="bg-white text-black text-[9px] font-black uppercase px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all">View Details</span>
+                  <span className="lg-surface text-white text-[9px] font-black uppercase px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all">View Details</span>
                 </div>
               </Link>
 
@@ -177,19 +177,18 @@ export default function Header() {
                 </span>
 
                 {/* CERTIFIED BADGE */}
-                <div className="flex items-center gap-1.5 mb-2 bg-blue-50 w-fit px-2 py-1 rounded-md">
-                  <Shield size={12} className="text-[#1e3a8a]" />
-                  <span className="text-[#1e3a8a] text-[9px] font-black uppercase tracking-wider">Certified Vertex Product</span>
+                <div className="flex items-center gap-1.5 mb-2 lg-badge w-fit px-2 py-1 rounded-md">
+                  <Shield size={12} className="text-[#0ea5e9]" />
+                  <span className="text-[#0ea5e9] text-[9px] font-black uppercase tracking-wider">Certified RRC Product</span>
                 </div>
 
-                {/* NOM CLIQUABLE */}
                 <Link href={`/products/${product.id}`}>
-                  <h3 className="font-black text-gray-900 uppercase text-lg mb-4 leading-tight group-hover:text-[#0ea5e9] transition-colors cursor-pointer">
+                  <h3 className="font-black text-white uppercase text-lg mb-4 leading-tight group-hover:text-[#0ea5e9] transition-colors cursor-pointer">
                     {product.name}
                   </h3>
                 </Link>
 
-                <p className="text-gray-400 text-xs mb-4 line-clamp-2 h-8">{product.description}</p>
+                <p className="text-white/30 text-xs mb-4 line-clamp-2 h-8">{product.description}</p>
                 
                 <div className="mt-auto">
                   <div className="flex items-baseline gap-2 mb-1">
@@ -198,11 +197,11 @@ export default function Header() {
                       <p className="text-gray-300 line-through text-sm">£{product.price}</p>
                     )}
                   </div>
-                  <p className="text-gray-500 text-xs mb-4">⭐ 4.6 (25 Reviews)</p>
+                  <p className="text-white/30 text-xs mb-4">⭐ 4.6 (25 Reviews)</p>
 
                   <button 
                     onClick={(e) => addToCart(e, product)} 
-                    className="w-full bg-black text-white py-4 rounded-xl font-black uppercase text-[10px] hover:bg-[#0ea5e9] transition-all flex items-center justify-center gap-2 group/btn"
+                    className="w-full lg-btn-accent text-white py-4 rounded-xl font-black uppercase text-[10px] flex items-center justify-center gap-2"
                   >
                     <ShoppingCart size={14} /> Add to Cart
                   </button>
