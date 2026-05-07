@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingCart, Menu, X, FlaskConical } from 'lucide-react'
+import { ShoppingCart, Menu, X } from 'lucide-react'
+import Image from 'next/image'
 
 const NAV = [
   { href: '/products', label: 'Shop' },
@@ -51,17 +52,15 @@ export default function Header() {
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110"
-              style={{ background: 'linear-gradient(135deg, #d97706, #b45309)', boxShadow: '0 4px 16px rgba(217,119,6,0.40)' }}
-            >
-              <FlaskConical size={17} className="text-white" />
-            </div>
-            <div className="leading-none">
-              <span className="text-xs font-black uppercase tracking-[0.14em] text-white block">Retatrutide RC</span>
-              <span className="text-[8px] font-medium uppercase tracking-[0.22em] block" style={{ color: '#52525b' }}>Research Center</span>
-            </div>
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/logo-share.png"
+              alt="Retatrutide Research Center"
+              width={160}
+              height={52}
+              className="h-10 w-auto object-contain transition-opacity duration-300 group-hover:opacity-80"
+              priority
+            />
           </Link>
 
           {/* Desktop nav */}

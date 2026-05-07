@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { FlaskConical, Mail, Github, Twitter, ArrowRight, MapPin, Phone, Clock } from 'lucide-react'
+import Image from 'next/image'
+import { Mail, Github, Twitter, ArrowRight, MapPin, Clock } from 'lucide-react'
 
 const LINKS = {
   Shop:    [{ label: 'All Products', href: '/products' }, { label: 'Categories', href: '/products' }, { label: 'Promotions', href: '/products' }],
@@ -26,15 +27,14 @@ export default function Footer() {
 
           {/* Brand column */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-3 mb-6 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: 'linear-gradient(135deg, #d97706, #b45309)', boxShadow: '0 4px 20px rgba(217,119,6,0.35)' }}>
-                <FlaskConical size={20} className="text-white" />
-              </div>
-              <div>
-                <p className="font-black uppercase tracking-[0.15em] text-white text-sm">Retatrutide RC</p>
-                <p className="text-[10px] uppercase tracking-widest" style={{ color: '#52525b' }}>Research Center</p>
-              </div>
+            <Link href="/" className="inline-block mb-6 group">
+              <Image
+                src="/logo-share.png"
+                alt="Retatrutide Research Center"
+                width={200}
+                height={65}
+                className="h-12 w-auto object-contain opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+              />
             </Link>
             <p className="text-sm leading-relaxed mb-8 max-w-xs" style={{ color: '#71717a' }}>
               Advancing GLP-1 peptide science through precision synthesis and HPLC-verified, research-grade compounds for laboratories worldwide.
