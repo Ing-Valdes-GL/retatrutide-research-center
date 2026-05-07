@@ -1,34 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  /* On définit nos couleurs brand directement ici pour Tailwind v4 */
-  --color-brand-primary: #0ea5e9;
-  --color-brand-secondary: #1e3a8a;
-  --color-brand-accent: #0284c7;
-  --color-brand-light: #e0f2fe;
-  --color-brand-dark: #1e40af;
-  
+  --color-brand-primary:   #84cc16;   /* lime green  */
+  --color-brand-secondary: #facc15;   /* yellow      */
+  --color-brand-accent:    #65a30d;   /* deep green  */
+  --color-brand-light:     #f7fee7;   /* very light green */
+  --color-brand-dark:      #1a2e05;   /* dark green bg */
+
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-  --color-border: hsl(var(--border));
+  --color-border:     hsl(var(--border));
 }
 
 @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
-    --border: 220 13% 91%;
+    --border:     220 13% 91%;
   }
   .dark {
     --background: 224 71% 4%;
     --foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
+    --border:     215 27.9% 16.9%;
   }
 }
 
 @layer base {
   body {
-    /* En v4, on utilise les variables définies dans @theme */
     background-color: var(--color-background);
     color: var(--color-foreground);
     transition-property: color, background-color;
@@ -36,24 +34,19 @@
   }
 }
 
-/* Sélection de texte */
 ::selection {
-  background-color: #0ea5e9;
-  color: #ffffff;
+  background-color: #84cc16;
+  color: #000;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-thumb {
-  background-color: #0ea5e9;
+  background-color: #84cc16;
   border-radius: 20px;
 }
 
-/* ── LIQUID GLASS SYSTEM ──────────────────────────────── */
+/* ── LIQUID GLASS SYSTEM ─────────────────────────────────────── */
 
-/* Base surface — panels, nav containers, overlays */
 .lg-surface {
   background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
   backdrop-filter: blur(24px) saturate(180%);
@@ -66,7 +59,7 @@
     0 2px 8px rgba(0,0,0,0.14);
 }
 
-/* Interactive glass button — neutral */
+/* Neutral glass button */
 .lg-btn {
   position: relative;
   background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%);
@@ -81,54 +74,90 @@
 }
 .lg-btn:hover {
   background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.09) 100%);
-  border-color: rgba(255,255,255,0.20);
+  border-color: rgba(132,204,22,0.30);
   box-shadow:
     inset 0 1.5px 0 rgba(255,255,255,0.28),
     inset 0 -1px 0 rgba(0,0,0,0.10),
-    0 8px 28px rgba(0,0,0,0.32);
+    0 8px 28px rgba(132,204,22,0.16);
   transform: translateY(-1px);
 }
 .lg-btn:active { transform: translateY(0px) scale(0.98); }
 
-/* Primary glass button — cyan tint */
+/* Primary glass button — green tint */
 .lg-btn-accent {
   position: relative;
-  background: linear-gradient(135deg, rgba(14,165,233,0.28) 0%, rgba(2,132,199,0.16) 100%);
+  background: linear-gradient(135deg, rgba(132,204,22,0.30) 0%, rgba(101,163,13,0.18) 100%);
   backdrop-filter: blur(24px) saturate(200%);
   -webkit-backdrop-filter: blur(24px) saturate(200%);
-  border: 1px solid rgba(14,165,233,0.38);
+  border: 1px solid rgba(132,204,22,0.42);
   box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.30),
-    inset 0 -1px 0 rgba(0,60,100,0.22),
-    0 4px 20px rgba(14,165,233,0.22),
+    inset 0 1.5px 0 rgba(255,255,255,0.28),
+    inset 0 -1px 0 rgba(0,50,0,0.22),
+    0 4px 20px rgba(132,204,22,0.22),
     0 8px 40px rgba(0,0,0,0.26);
   color: white;
   transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease, border-color 0.22s ease;
 }
 .lg-btn-accent:hover {
-  background: linear-gradient(135deg, rgba(14,165,233,0.38) 0%, rgba(2,132,199,0.24) 100%);
-  border-color: rgba(14,165,233,0.55);
+  background: linear-gradient(135deg, rgba(132,204,22,0.42) 0%, rgba(101,163,13,0.28) 100%);
+  border-color: rgba(132,204,22,0.60);
   box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.36),
-    inset 0 -1px 0 rgba(0,60,100,0.18),
-    0 8px 32px rgba(14,165,233,0.32),
+    inset 0 1.5px 0 rgba(255,255,255,0.34),
+    inset 0 -1px 0 rgba(0,50,0,0.18),
+    0 8px 32px rgba(132,204,22,0.32),
     0 16px 48px rgba(0,0,0,0.30);
   transform: translateY(-1px);
 }
 .lg-btn-accent:active { transform: translateY(0px) scale(0.98); }
 
-/* Info badge / pill — cyan tint */
-.lg-badge {
-  background: linear-gradient(135deg, rgba(14,165,233,0.16) 0%, rgba(14,165,233,0.06) 100%);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid rgba(14,165,233,0.28);
+/* Yellow accent button */
+.lg-btn-yellow {
+  position: relative;
+  background: linear-gradient(135deg, rgba(250,204,21,0.30) 0%, rgba(234,179,8,0.18) 100%);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(250,204,21,0.42);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.18),
-    0 2px 12px rgba(14,165,233,0.12);
+    inset 0 1.5px 0 rgba(255,255,255,0.28),
+    inset 0 -1px 0 rgba(80,50,0,0.22),
+    0 4px 20px rgba(250,204,21,0.22),
+    0 8px 40px rgba(0,0,0,0.26);
+  color: white;
+  transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease, border-color 0.22s ease;
+}
+.lg-btn-yellow:hover {
+  background: linear-gradient(135deg, rgba(250,204,21,0.44) 0%, rgba(234,179,8,0.28) 100%);
+  border-color: rgba(250,204,21,0.60);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,0.34),
+    0 8px 32px rgba(250,204,21,0.28),
+    0 16px 48px rgba(0,0,0,0.30);
+  transform: translateY(-1px);
 }
 
-/* Dark card — for sections on dark bg */
+/* Info badge / pill — green tint */
+.lg-badge {
+  background: linear-gradient(135deg, rgba(132,204,22,0.16) 0%, rgba(132,204,22,0.06) 100%);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(132,204,22,0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    0 2px 12px rgba(132,204,22,0.12);
+}
+
+/* Yellow badge */
+.lg-badge-yellow {
+  background: linear-gradient(135deg, rgba(250,204,21,0.16) 0%, rgba(250,204,21,0.06) 100%);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(250,204,21,0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    0 2px 12px rgba(250,204,21,0.10);
+}
+
+/* Dark card */
 .lg-card {
   background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
   backdrop-filter: blur(20px) saturate(160%);
@@ -140,11 +169,11 @@
   transition: box-shadow 0.28s ease, border-color 0.28s ease, transform 0.24s ease;
 }
 .lg-card:hover {
-  border-color: rgba(14,165,233,0.25);
+  border-color: rgba(132,204,22,0.28);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.16),
-    0 0 0 1px rgba(14,165,233,0.12),
-    0 8px 40px rgba(14,165,233,0.14),
+    0 0 0 1px rgba(132,204,22,0.12),
+    0 8px 40px rgba(132,204,22,0.14),
     0 16px 48px rgba(0,0,0,0.36);
   transform: translateY(-2px);
 }
