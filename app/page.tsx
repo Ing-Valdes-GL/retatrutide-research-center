@@ -340,6 +340,88 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── VIDEO SECTION ────────────────────────────────────────── */}
+      <section className="py-28" style={{ background: '#09090b' }}>
+        <div className="container mx-auto px-6">
+          <motion.div {...fadeUp(0)} className="text-center mb-16">
+            <p className="text-[10px] font-black uppercase tracking-[0.35em] mb-4" style={{ color: '#10b981' }}>Research in Action</p>
+            <h2 className="text-5xl font-black tracking-[-0.04em] text-white">
+              Lab <span className="ds-text-gradient-emerald">Footage</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Main large video */}
+            <motion.div {...fadeUp(0)} className="lg:row-span-2">
+              <div className="relative rounded-2xl overflow-hidden ds-card group" style={{ minHeight: '420px' }}>
+                <video
+                  autoPlay muted loop playsInline preload="metadata"
+                  poster="/assets/cells-poster.webp"
+                  className="w-full h-full object-cover absolute inset-0"
+                  style={{ minHeight: '420px' }}
+                >
+                  <source src="/assets/cells.mp4" type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ background: 'linear-gradient(to top, rgba(9,9,11,0.85) 0%, rgba(9,9,11,0.10) 60%)' }} />
+                <div className="absolute bottom-0 left-0 right-0 p-8">
+                  <span className="ds-badge-emerald text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full inline-block mb-3">
+                    Live · In-Vitro Research
+                  </span>
+                  <h3 className="text-xl font-black text-white mb-1">Cell Receptor Binding Study</h3>
+                  <p className="text-sm" style={{ color: '#71717a' }}>GLP-1 receptor activation in adipocyte culture — RRC Lab, 2024</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Top-right: video 2 */}
+            <motion.div {...fadeUp(0.1)}>
+              <div className="relative rounded-2xl overflow-hidden ds-card group" style={{ minHeight: '200px' }}>
+                <video
+                  autoPlay muted loop playsInline preload="metadata"
+                  poster="/assets/cells-poster.webp"
+                  className="w-full h-full object-cover absolute inset-0"
+                  style={{ minHeight: '200px' }}
+                >
+                  <source src="/assets/cells.mp4" type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ background: 'linear-gradient(to top, rgba(9,9,11,0.85) 0%, rgba(9,9,11,0.05) 60%)' }} />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <span className="ds-badge text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full inline-block mb-2">
+                    HPLC Analysis
+                  </span>
+                  <h4 className="text-sm font-black text-white">Purity Verification Process</h4>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Bottom-right: stat card */}
+            <motion.div {...fadeUp(0.2)}>
+              <div className="rounded-2xl p-8 ds-surface flex flex-col justify-between" style={{ minHeight: '200px', border: '1px solid rgba(217,119,6,0.20)' }}>
+                <div className="h-0.5 w-12 rounded-full mb-6" style={{ background: 'linear-gradient(90deg, #d97706, #f59e0b)' }} />
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.35em] mb-3" style={{ color: '#d97706' }}>Research Output</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { val: '12+', label: 'Studies supported' },
+                      { val: '≥99%', label: 'Avg purity CoA' },
+                      { val: '3M+', label: 'Units dispatched' },
+                      { val: '4.9★', label: 'Researcher rating' },
+                    ].map(s => (
+                      <div key={s.label}>
+                        <p className="text-2xl font-black ds-mono ds-text-gradient">{s.val}</p>
+                        <p className="text-[10px] mt-0.5" style={{ color: '#52525b' }}>{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* ── HOW IT WORKS ─────────────────────────────────────────── */}
       <section className="py-28" style={{ background: '#09090b' }}>
         <div className="container mx-auto px-6">

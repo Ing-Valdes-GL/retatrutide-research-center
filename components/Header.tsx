@@ -51,16 +51,16 @@ export default function Header() {
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
+          <Link href="/" className="flex items-center gap-3 group">
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110"
+              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110"
               style={{ background: 'linear-gradient(135deg, #d97706, #b45309)', boxShadow: '0 4px 16px rgba(217,119,6,0.40)' }}
             >
-              <FlaskConical size={16} className="text-white" />
+              <FlaskConical size={17} className="text-white" />
             </div>
             <div className="leading-none">
-              <span className="text-xs font-black uppercase tracking-[0.14em] text-white block">RRC</span>
-              <span className="text-[8px] font-medium uppercase tracking-[0.22em] block" style={{ color: '#52525b' }}>Research</span>
+              <span className="text-xs font-black uppercase tracking-[0.14em] text-white block">Retatrutide RC</span>
+              <span className="text-[8px] font-medium uppercase tracking-[0.22em] block" style={{ color: '#52525b' }}>Research Center</span>
             </div>
           </Link>
 

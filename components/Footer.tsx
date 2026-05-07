@@ -1,13 +1,19 @@
 'use client'
 
 import Link from 'next/link'
-import { FlaskConical, Mail, Github, Twitter, ArrowRight } from 'lucide-react'
+import { FlaskConical, Mail, Github, Twitter, ArrowRight, MapPin, Phone, Clock } from 'lucide-react'
 
 const LINKS = {
   Shop:    [{ label: 'All Products', href: '/products' }, { label: 'Categories', href: '/products' }, { label: 'Promotions', href: '/products' }],
   Company: [{ label: 'About RRC',   href: '/about' },    { label: 'Research',   href: '/about' },    { label: 'Contact',    href: '/chat' }],
   Account: [{ label: 'Sign In',     href: '/login' },    { label: 'My Orders',  href: '/orders' },   { label: 'Cart',       href: '/cart' }],
 }
+
+const LOCATIONS = [
+  { city: 'London, UK', address: 'Headquarters & Distribution', flag: '🇬🇧' },
+  { city: 'Amsterdam, NL', address: 'EU Research Facility', flag: '🇳🇱' },
+  { city: 'Worldwide', address: 'Shipping to 50+ countries', flag: '🌍' },
+]
 
 export default function Footer() {
   return (
@@ -16,7 +22,7 @@ export default function Footer() {
       <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, transparent, #d97706 30%, #f59e0b 50%, #d97706 70%, transparent)' }} />
 
       <div className="container mx-auto px-6 py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-7 gap-12">
 
           {/* Brand column */}
           <div className="lg:col-span-2">
@@ -70,6 +76,39 @@ export default function Footer() {
               </ul>
             </div>
           ))}
+
+          {/* Locations column */}
+          <div className="lg:col-span-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] mb-6" style={{ color: '#52525b' }}>Locations</p>
+            <ul className="space-y-5">
+              {LOCATIONS.map((loc) => (
+                <li key={loc.city} className="flex items-start gap-3">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                    style={{ background: 'rgba(217,119,6,0.10)', border: '1px solid rgba(217,119,6,0.20)' }}>
+                    <MapPin size={12} style={{ color: '#d97706' }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-white leading-tight">{loc.flag} {loc.city}</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: '#52525b' }}>{loc.address}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-6 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Clock size={11} style={{ color: '#52525b' }} />
+                <span className="text-[11px]" style={{ color: '#52525b' }}>Mon–Fri · 9am–6pm GMT</span>
+              </div>
+              <Link href="/chat"
+                className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-colors"
+                style={{ color: '#d97706' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#fbbf24')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#d97706')}>
+                <Mail size={11} /> Contact Support →
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Bottom bar */}
