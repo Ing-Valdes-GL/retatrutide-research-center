@@ -51,7 +51,6 @@ function ChatContent() {
       const { data: existing } = await supabase
         .from('chat_conversations').select('*')
         .eq('user_id', userId).eq('status', 'active').maybeSingle()
-
       if (existing) {
         setConversation(existing)
       } else {
@@ -155,38 +154,41 @@ function ChatContent() {
   }, [])
 
   return (
-    <div className="h-screen flex flex-col bg-[#050505] text-white overflow-hidden">
+    <div className="h-screen flex flex-col bg-white overflow-hidden" style={{ color: '#1a2e05' }}>
       <Header />
 
-      {/* ── CHAT SHELL ── */}
       <div className="flex-1 min-h-0 flex flex-col">
 
-        {/* Top status bar */}
-        <div className="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-3 border-b border-white/5 lg-surface shrink-0">
+        {/* Status bar */}
+        <div className="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-3 shrink-0"
+          style={{ background: '#f7fee7', borderBottom: '1px solid rgba(132,204,22,0.15)' }}>
           <div className="flex items-center gap-3">
-            {/* Agent avatar */}
             <div className="relative">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#0ea5e9] to-[#1e3a8a] flex items-center justify-center text-white font-black text-xs shrink-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-black text-xs shrink-0"
+                style={{ background: 'linear-gradient(135deg, #84cc16, #65a30d)' }}>
                 RRC
               </div>
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#050505]" />
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-white" />
             </div>
             <div>
-              <p className="font-black text-xs sm:text-sm uppercase tracking-tight leading-none">Support Team</p>
+              <p className="font-black text-xs sm:text-sm uppercase tracking-tight leading-none" style={{ color: '#1a2e05' }}>Support Team</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/80">Online · Avg reply &lt; 2min</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: '#65a30d' }}>
+                  Online · Avg reply &lt; 2min
+                </span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden sm:flex items-center gap-1.5 lg-badge px-3 py-1.5 rounded-full">
-              <Lock size={10} className="text-[#0ea5e9]" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-[#0ea5e9]">E2E Encrypted</span>
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full lg-badge">
+              <Lock size={10} style={{ color: '#65a30d' }} />
+              <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#65a30d' }}>E2E Encrypted</span>
             </div>
-            <div className="flex items-center gap-1.5 lg-surface px-3 py-1.5 rounded-full">
-              <Wifi size={10} className="text-white/40" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Secure</span>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+              style={{ background: 'rgba(132,204,22,0.08)', border: '1px solid rgba(132,204,22,0.15)' }}>
+              <Wifi size={10} style={{ color: '#84cc16' }} />
+              <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#84cc16' }}>Secure</span>
             </div>
           </div>
         </div>
@@ -196,47 +198,47 @@ function ChatContent() {
           ref={scrollAreaRef}
           onScroll={handleScroll}
           className="flex-1 min-h-0 overflow-y-auto px-3 sm:px-6 lg:px-10 py-6 space-y-6"
-          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(14,165,233,0.2) transparent' }}
+          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(132,204,22,0.3) transparent', background: '#fafffe' }}
         >
           {loading ? (
             <div className="h-full flex flex-col items-center justify-center gap-4">
-              <div className="w-10 h-10 border-2 border-[#0ea5e9] border-t-transparent rounded-full animate-spin" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Initializing secure channel…</p>
+              <div className="w-10 h-10 border-2 border-[#84cc16] border-t-transparent rounded-full animate-spin" />
+              <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#9ca3af' }}>
+                Connecting to support…
+              </p>
             </div>
-
           ) : messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center px-4 gap-6">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0ea5e9]/20 to-[#1e3a8a]/20 border border-[#0ea5e9]/20 flex items-center justify-center">
-                <Shield size={28} className="text-[#0ea5e9]" />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                style={{ background: '#f0fdf4', border: '1.5px solid rgba(132,204,22,0.20)', boxShadow: '0 4px 20px rgba(132,204,22,0.12)' }}>
+                <Shield size={28} style={{ color: '#65a30d' }} />
               </div>
               <div>
-                <p className="font-black text-base uppercase tracking-tight text-white mb-2">Secure Channel Ready</p>
-                <p className="text-xs text-white/40 max-w-xs leading-relaxed">
+                <p className="font-black text-base uppercase tracking-tight mb-2" style={{ color: '#1a2e05' }}>Secure Channel Ready</p>
+                <p className="text-xs max-w-xs leading-relaxed" style={{ color: '#6b7280' }}>
                   Send your order reference or any inquiry. Our team will respond within minutes.
                 </p>
               </div>
-              {/* Quick prompt chips */}
               <div className="flex flex-wrap justify-center gap-2 max-w-sm">
                 {['Track my order', 'Shipping info', 'Product query', 'Payment issue'].map((t) => (
                   <button
                     key={t}
                     onClick={() => setNewMessage(t)}
-                    className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider lg-btn text-white/60 hover:text-[#0ea5e9]"
+                    className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider lg-btn"
                   >
                     {t}
                   </button>
                 ))}
               </div>
             </div>
-
           ) : (
             groupedMessages.map(({ date, msgs }) => (
               <div key={date}>
                 {/* Date divider */}
                 <div className="flex items-center gap-3 my-4">
-                  <div className="flex-1 h-px bg-white/5" />
-                  <span className="text-[9px] font-black uppercase tracking-widest text-white/20 px-2">{date}</span>
-                  <div className="flex-1 h-px bg-white/5" />
+                  <div className="flex-1 h-px" style={{ background: 'rgba(132,204,22,0.15)' }} />
+                  <span className="text-[9px] font-black uppercase tracking-widest px-2" style={{ color: '#9ca3af' }}>{date}</span>
+                  <div className="flex-1 h-px" style={{ background: 'rgba(132,204,22,0.15)' }} />
                 </div>
 
                 <div className="space-y-3">
@@ -247,17 +249,18 @@ function ChatContent() {
                       <div
                         key={msg.id}
                         className={`flex gap-2.5 ${isOwn ? 'flex-row-reverse' : 'flex-row'} ${prevSame ? 'mt-1' : 'mt-3'}`}
-                        style={{ animationDelay: `${i * 30}ms` }}
                       >
-                        {/* Avatar (only on first in run) */}
+                        {/* Avatar */}
                         <div className="w-7 h-7 shrink-0 self-end">
                           {!prevSame && (
                             isOwn ? (
-                              <div className="w-7 h-7 rounded-full bg-[#0ea5e9]/20 border border-[#0ea5e9]/30 flex items-center justify-center text-[8px] font-black text-[#0ea5e9] uppercase">
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center text-[8px] font-black uppercase"
+                                style={{ background: 'rgba(132,204,22,0.15)', border: '1px solid rgba(132,204,22,0.25)', color: '#65a30d' }}>
                                 {user?.email?.[0] ?? 'U'}
                               </div>
                             ) : (
-                              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#0ea5e9] to-[#1e3a8a] flex items-center justify-center text-[7px] font-black text-white">
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center text-[7px] font-black text-white"
+                                style={{ background: 'linear-gradient(135deg, #84cc16, #65a30d)' }}>
                                 RRC
                               </div>
                             )
@@ -266,25 +269,17 @@ function ChatContent() {
 
                         {/* Bubble */}
                         <div className={`flex flex-col max-w-[75%] sm:max-w-[65%] ${isOwn ? 'items-end' : 'items-start'}`}>
-                          <div className={`relative px-4 py-3 text-sm leading-relaxed break-words ${
-                            isOwn
-                              ? 'bg-gradient-to-br from-[#0ea5e9] to-[#0284c7] text-white rounded-2xl rounded-tr-sm shadow-lg shadow-sky-500/10'
-                              : 'bg-white/5 border border-white/8 text-white/90 rounded-2xl rounded-tl-sm'
-                          }`}>
-                            {msg.message_type === 'text' && (
-                              <p>{msg.content}</p>
-                            )}
+                          <div className={`px-4 py-3 text-sm leading-relaxed break-words ${isOwn ? 'rounded-2xl rounded-tr-sm' : 'rounded-2xl rounded-tl-sm'}`}
+                            style={isOwn
+                              ? { background: 'linear-gradient(135deg, #84cc16, #65a30d)', color: '#ffffff', boxShadow: '0 4px 16px rgba(132,204,22,0.25)' }
+                              : { background: '#ffffff', color: '#1a2e05', border: '1px solid rgba(132,204,22,0.15)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }
+                            }
+                          >
+                            {msg.message_type === 'text' && <p>{msg.content}</p>}
                             {msg.message_type === 'image' && msg.file_url && (
-                              <button
-                                onClick={() => setLightboxUrl(msg.file_url ?? null)}
-                                className="relative group block"
-                              >
-                                <img
-                                  src={msg.file_url}
-                                  alt="Attachment"
-                                  className="rounded-xl max-h-56 object-cover w-full"
-                                />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
+                              <button onClick={() => setLightboxUrl(msg.file_url ?? null)} className="relative group block">
+                                <img src={msg.file_url} alt="Attachment" className="rounded-xl max-h-56 object-cover w-full" />
+                                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
                                   <ZoomIn size={20} className="text-white" />
                                 </div>
                               </button>
@@ -292,13 +287,13 @@ function ChatContent() {
                           </div>
                           {/* Meta */}
                           <div className={`flex items-center gap-1.5 mt-1 px-1 ${isOwn ? 'flex-row' : 'flex-row-reverse'}`}>
-                            <span className="text-[9px] text-white/25 font-bold tabular-nums">
+                            <span className="text-[9px] font-bold tabular-nums" style={{ color: '#9ca3af' }}>
                               {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                             {isOwn && (
                               msg.is_read
-                                ? <CheckCheck size={11} className="text-[#0ea5e9]" />
-                                : <Check size={11} className="text-white/30" />
+                                ? <CheckCheck size={11} style={{ color: '#65a30d' }} />
+                                : <Check size={11} style={{ color: '#9ca3af' }} />
                             )}
                           </div>
                         </div>
@@ -316,22 +311,28 @@ function ChatContent() {
         {!atBottom && (
           <button
             onClick={scrollToBottom}
-            className="absolute bottom-24 right-6 w-9 h-9 lg-btn-accent text-white rounded-full flex items-center justify-center hover:scale-110 z-20"
+            className="absolute bottom-24 right-6 w-9 h-9 text-white rounded-full flex items-center justify-center hover:scale-110 z-20 transition-transform"
+            style={{ background: 'linear-gradient(135deg, #84cc16, #65a30d)', boxShadow: '0 4px 16px rgba(132,204,22,0.35)' }}
           >
             <ChevronDown size={16} />
           </button>
         )}
 
         {/* Input bar */}
-        <div className="shrink-0 px-3 sm:px-6 lg:px-10 py-4 border-t border-white/5 lg-surface">
-          <div className="flex items-end gap-2 lg-surface rounded-2xl p-2 focus-within:border-[#0ea5e9]/40 transition-all">
+        <div className="shrink-0 px-3 sm:px-6 lg:px-10 py-4"
+          style={{ borderTop: '1px solid rgba(132,204,22,0.12)', background: '#f7fee7' }}>
+          <div className="flex items-end gap-2 rounded-2xl p-2"
+            style={{ background: '#ffffff', border: '1.5px solid rgba(132,204,22,0.20)' }}>
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="w-10 h-10 flex items-center justify-center rounded-xl text-white/40 hover:text-[#0ea5e9] lg-btn shrink-0"
+              className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors shrink-0"
+              style={{ color: '#9ca3af' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#84cc16')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}
             >
               {uploading
-                ? <div className="w-4 h-4 border-2 border-[#0ea5e9] border-t-transparent rounded-full animate-spin" />
+                ? <div className="w-4 h-4 border-2 border-[#84cc16] border-t-transparent rounded-full animate-spin" />
                 : <Paperclip size={18} />}
             </button>
 
@@ -352,13 +353,15 @@ function ChatContent() {
                 }
               }}
               placeholder="Type a message… (Enter to send)"
-              className="flex-1 bg-transparent border-none focus:ring-0 outline-none resize-none text-sm text-white placeholder:text-white/25 py-2 px-1 min-h-[40px] max-h-[120px] leading-relaxed"
+              className="flex-1 bg-transparent border-none focus:ring-0 outline-none resize-none text-sm py-2 px-1 min-h-[40px] max-h-[120px] leading-relaxed"
+              style={{ color: '#1a2e05' }}
             />
 
             <button
               onClick={sendMessage}
               disabled={!newMessage.trim() || sending}
-              className="w-10 h-10 lg-btn-accent text-white flex items-center justify-center rounded-xl active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed shrink-0"
+              className="w-10 h-10 text-white flex items-center justify-center rounded-xl active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shrink-0 transition-all"
+              style={{ background: 'linear-gradient(135deg, #84cc16, #65a30d)', boxShadow: '0 2px 12px rgba(132,204,22,0.30)' }}
             >
               {sending
                 ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -366,8 +369,8 @@ function ChatContent() {
             </button>
           </div>
 
-          <p className="text-center text-[8px] font-bold uppercase tracking-[0.25em] text-white/15 mt-2">
-            Transmission encrypted · Retatrutide Research Center v3.4
+          <p className="text-center text-[8px] font-bold uppercase tracking-[0.25em] mt-2" style={{ color: '#9ca3af' }}>
+            Transmission encrypted · Retatrutide Research Center
           </p>
         </div>
       </div>
@@ -375,11 +378,11 @@ function ChatContent() {
       {/* Lightbox */}
       {lightboxUrl && (
         <div
-          className="fixed inset-0 z-[500] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[500] bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm"
           onClick={() => setLightboxUrl(null)}
         >
           <button
-            className="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+            className="absolute top-4 right-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors"
             onClick={() => setLightboxUrl(null)}
           >
             <X size={18} />
@@ -399,10 +402,10 @@ function ChatContent() {
 export default function ChatPage() {
   return (
     <Suspense fallback={
-      <div className="h-screen bg-[#050505] flex flex-col items-center justify-center gap-4">
-        <div className="w-10 h-10 border-2 border-[#0ea5e9] border-t-transparent rounded-full animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-widest text-[#0ea5e9]/60">
-          Initializing Secure Channel…
+      <div className="h-screen bg-white flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-2 border-[#84cc16] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#9ca3af' }}>
+          Connecting to support…
         </p>
       </div>
     }>

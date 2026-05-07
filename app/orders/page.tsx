@@ -3,13 +3,13 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { useTheme } from '@/components/ThemeProvider'
+import { motion, AnimatePresence } from 'framer-motion'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { Package, Clock, CheckCircle, XCircle, ChevronDown, ChevronUp, Hash } from 'lucide-react'
+import { Package, ChevronDown, Hash, CheckCircle2, XCircle, Clock, ShoppingBag, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 
 export default function OrdersPage() {
-  const { theme } = useTheme() // Still keeping the hook for system compatibility
   const router = useRouter()
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -22,7 +22,6 @@ export default function OrdersPage() {
         .select('*, order_items(*)')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
-
       if (error) throw error
       setOrders(data || [])
     } catch (error) {
@@ -43,121 +42,186 @@ export default function OrdersPage() {
 
   const getStatusBadge = (status: string) => {
     const s = status?.toLowerCase()
-    const baseClass = "px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border"
-    
-    if (s === 'confirmed' || s === 'approved') 
-      return <span className={`${baseClass} bg-green-500/10 text-green-400 border-green-500/20`}>Confirmed</span>
-    if (s === 'rejected' || s === 'cancelled') 
-      return <span className={`${baseClass} bg-red-500/10 text-red-400 border-red-500/20`}>Rejected</span>
-    
-    return <span className={`${baseClass} bg-amber-500/10 text-amber-400 border-amber-500/20`}>Pending</span>
+    if (s === 'confirmed' || s === 'approved')
+      return (
+        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
+          style={{ background: 'rgba(132,204,22,0.10)', color: '#65a30d', border: '1px solid rgba(132,204,22,0.20)' }}>
+          <CheckCircle2 size={11} /> Confirmed
+        </span>
+      )
+    if (s === 'rejected' || s === 'cancelled')
+      return (
+        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
+          style={{ background: 'rgba(239,68,68,0.08)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.15)' }}>
+          <XCircle size={11} /> Cancelled
+        </span>
+      )
+    return (
+      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
+        style={{ background: 'rgba(250,204,21,0.12)', color: '#ca8a04', border: '1px solid rgba(250,204,21,0.25)' }}>
+        <Clock size={11} /> Pending
+      </span>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 font-sans">
+    <div className="min-h-screen bg-white text-[#14532d]">
       <Header />
 
-      <main className="container mx-auto px-6 py-16 max-w-5xl">
-        <header className="mb-12">
-          <h1 className="text-4xl font-bold tracking-tight text-white mb-2">Order History</h1>
-          <p className="text-zinc-500 text-sm">Review and track your pharmaceutical transmissions.</p>
-        </header>
+      {/* Page header */}
+      <section className="pt-20 pb-12 text-center relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #f7fee7 0%, #ffffff 60%)' }}>
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle, #84cc16 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.p
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring' as const, bounce: 0.3, duration: 0.8 }}
+            className="text-[11px] uppercase tracking-[0.35em] font-black mb-3" style={{ color: '#65a30d' }}>
+            My Account
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring' as const, bounce: 0.25, duration: 0.9, delay: 0.06 }}
+            className="text-4xl md:text-5xl font-black tracking-tight" style={{ color: '#1a2e05', letterSpacing: '-0.03em' }}>
+            Order History
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ delay: 0.15 }}
+            className="text-[#4b7c59] text-sm mt-2">
+            Review and track your research compound orders.
+          </motion.p>
+        </div>
+      </section>
 
+      <main className="container mx-auto px-6 py-12 pb-24 max-w-5xl">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 space-y-4">
-            <div className="w-8 h-8 border-2 border-zinc-800 border-t-zinc-400 rounded-full animate-spin"></div>
-            <p className="text-zinc-500 text-xs font-medium uppercase tracking-widest">Loading Records...</p>
+          <div className="py-24 flex flex-col items-center justify-center gap-4">
+            <div className="w-10 h-10 rounded-full border-2 border-[#84cc16] border-t-transparent animate-spin" />
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#9ca3af]">Loading orders…</p>
           </div>
         ) : orders.length === 0 ? (
-          <div className="bg-zinc-900/50 border border-zinc-800 p-20 text-center rounded-2xl">
-            <Package className="mx-auto mb-4 text-zinc-700" size={48} />
-            <p className="text-zinc-500 font-medium">No order history found.</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            className="py-32 text-center"
+          >
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
+              style={{ background: '#f7fee7', border: '1.5px solid rgba(132,204,22,0.20)' }}>
+              <ShoppingBag size={32} className="text-[#84cc16]" />
+            </div>
+            <h2 className="text-2xl font-black mb-3" style={{ color: '#1a2e05' }}>No orders yet</h2>
+            <p className="text-[#6b7280] text-sm mb-8">Your research compound orders will appear here.</p>
+            <Link href="/products"
+              className="lg-btn-accent inline-flex items-center gap-2 px-8 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest">
+              Browse Products <ArrowRight size={14} />
+            </Link>
+          </motion.div>
         ) : (
-          <div className="space-y-6">
-            {orders.map((order) => (
-              <div 
-                key={order.id} 
-                className={`group border transition-all duration-300 overflow-hidden rounded-2xl ${
-                  expandedOrderId === order.id 
-                  ? 'border-zinc-700 bg-zinc-900 shadow-2xl' 
-                  : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700'
-                }`}
-              >
-                {/* Summary Header */}
-                <div 
-                  className="p-6 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6"
-                  onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
+          <div className="space-y-4">
+            <AnimatePresence>
+              {orders.map((order, i) => (
+                <motion.div
+                  key={order.id}
+                  layout
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring' as const, bounce: 0.2, duration: 0.5, delay: i * 0.05 }}
+                  className="rounded-2xl overflow-hidden"
+                  style={{
+                    background: '#fff',
+                    border: expandedOrderId === order.id
+                      ? '1.5px solid rgba(132,204,22,0.30)'
+                      : '1.5px solid rgba(132,204,22,0.14)',
+                    boxShadow: expandedOrderId === order.id
+                      ? '0 8px 32px rgba(132,204,22,0.12)'
+                      : '0 2px 12px rgba(0,0,0,0.04)',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                  }}
                 >
-                  <div className="flex flex-wrap items-center gap-8">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-zinc-800 rounded-lg text-zinc-400 group-hover:text-zinc-200 transition-colors">
-                            <Hash size={16} />
+                  {/* Summary row */}
+                  <div
+                    className="p-6 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6"
+                    onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
+                  >
+                    <div className="flex flex-wrap items-center gap-8">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg" style={{ background: '#f7fee7', border: '1px solid rgba(132,204,22,0.18)' }}>
+                          <Hash size={16} style={{ color: '#65a30d' }} />
                         </div>
                         <div>
-                            <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest">Reference</p>
-                            <p className="text-sm font-mono font-bold text-white uppercase">
-                                {order.order_reference || order.reference_code || order.id.slice(0, 8)}
-                            </p>
+                          <p className="text-[10px] uppercase font-black tracking-widest mb-0.5" style={{ color: '#9ca3af' }}>Reference</p>
+                          <p className="text-sm font-black uppercase tracking-tight" style={{ color: '#1a2e05' }}>
+                            {order.order_reference || order.reference_code || order.id.slice(0, 8)}
+                          </p>
                         </div>
-                    </div>
-                    
-                    <div className="hidden sm:block w-[1px] h-8 bg-zinc-800"></div>
+                      </div>
 
-                    <div>
-                      <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest">Ordered On</p>
-                      <p className="text-sm text-zinc-300 font-medium">
-                        {new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                      </p>
-                    </div>
-                  </div>
+                      <div className="hidden sm:block w-px h-8" style={{ background: 'rgba(132,204,22,0.15)' }} />
 
-                  <div className="flex items-center justify-between md:justify-end gap-10">
-                    <div className="text-right">
-                      <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest">Total Amount</p>
-                      <p className="text-lg font-bold text-white">£{Number(order.total_amount).toFixed(2)}</p>
+                      <div>
+                        <p className="text-[10px] uppercase font-black tracking-widest mb-0.5" style={{ color: '#9ca3af' }}>Ordered On</p>
+                        <p className="text-sm font-medium" style={{ color: '#4b7c59' }}>
+                          {new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      {getStatusBadge(order.status)}
-                      <div className={`p-1 rounded-full transition-transform duration-300 ${expandedOrderId === order.id ? 'rotate-180 bg-zinc-800 text-white' : 'text-zinc-600'}`}>
-                        <ChevronDown size={20} />
+
+                    <div className="flex items-center justify-between md:justify-end gap-8">
+                      <div className="text-right">
+                        <p className="text-[10px] uppercase font-black tracking-widest mb-0.5" style={{ color: '#9ca3af' }}>Total</p>
+                        <p className="text-lg font-black" style={{ color: '#ca8a04' }}>£{Number(order.total_amount).toFixed(2)}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {getStatusBadge(order.status)}
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${expandedOrderId === order.id ? 'rotate-180' : ''}`}
+                          style={{ background: expandedOrderId === order.id ? '#f7fee7' : 'transparent' }}>
+                          <ChevronDown size={18} style={{ color: '#84cc16' }} />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Detailed Table Section */}
-                {expandedOrderId === order.id && (
-                  <div className="bg-black/20 border-t border-zinc-800 p-8 animate-in fade-in duration-300">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="text-[10px] uppercase text-zinc-500 border-b border-zinc-800">
-                          <th className="text-left pb-4 font-bold tracking-widest">Item Description</th>
-                          <th className="text-center pb-4 font-bold tracking-widest">Qty</th>
-                          <th className="text-right pb-4 font-bold tracking-widest">Unit Price</th>
-                          <th className="text-right pb-4 font-bold tracking-widest">Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-zinc-800/50">
-                        {order.order_items?.map((item: any) => (
-                          <tr key={item.id} className="text-zinc-300 hover:bg-white/[0.02] transition-colors">
-                            <td className="py-5 font-medium text-zinc-100">{item.product_name}</td>
-                            <td className="py-5 text-center font-bold">
-                                <span className="text-zinc-600 text-[10px] mr-1 italic">x</span>
-                                {item.quantity}
-                            </td>
-                            <td className="py-5 text-right font-mono text-zinc-400">£{Number(item.unit_price).toFixed(2)}</td>
-                            <td className="py-5 text-right font-bold text-white font-mono">
-                              £{(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            ))}
+                  {/* Expanded items */}
+                  <AnimatePresence>
+                    {expandedOrderId === order.id && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-6 pb-6 pt-2" style={{ borderTop: '1px solid rgba(132,204,22,0.10)', background: '#fafffe' }}>
+                          <table className="w-full text-sm mt-4">
+                            <thead>
+                              <tr style={{ borderBottom: '1px solid rgba(132,204,22,0.12)' }}>
+                                <th className="text-left pb-3 text-[10px] uppercase font-black tracking-widest" style={{ color: '#9ca3af' }}>Item</th>
+                                <th className="text-center pb-3 text-[10px] uppercase font-black tracking-widest" style={{ color: '#9ca3af' }}>Qty</th>
+                                <th className="text-right pb-3 text-[10px] uppercase font-black tracking-widest" style={{ color: '#9ca3af' }}>Unit Price</th>
+                                <th className="text-right pb-3 text-[10px] uppercase font-black tracking-widest" style={{ color: '#9ca3af' }}>Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {order.order_items?.map((item: any) => (
+                                <tr key={item.id} style={{ borderBottom: '1px solid rgba(132,204,22,0.07)' }}>
+                                  <td className="py-4 font-black text-sm" style={{ color: '#1a2e05' }}>{item.product_name}</td>
+                                  <td className="py-4 text-center font-bold text-sm" style={{ color: '#4b7c59' }}>× {item.quantity}</td>
+                                  <td className="py-4 text-right font-medium text-sm" style={{ color: '#6b7280' }}>£{Number(item.unit_price).toFixed(2)}</td>
+                                  <td className="py-4 text-right font-black text-sm" style={{ color: '#ca8a04' }}>
+                                    £{(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         )}
       </main>

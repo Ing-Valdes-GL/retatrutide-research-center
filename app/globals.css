@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-primary:   #84cc16;   /* lime green  */
-  --color-brand-secondary: #facc15;   /* yellow      */
-  --color-brand-accent:    #65a30d;   /* deep green  */
-  --color-brand-light:     #f7fee7;   /* very light green */
-  --color-brand-dark:      #1a2e05;   /* dark green bg */
+  --color-brand-primary:   #84cc16;
+  --color-brand-secondary: #facc15;
+  --color-brand-accent:    #65a30d;
+  --color-brand-light:     #f7fee7;
+  --color-brand-dark:      #1a2e05;
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -16,7 +16,7 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
-    --border:     220 13% 91%;
+    --border:     120 20% 88%;
   }
   .dark {
     --background: 224 71% 4%;
@@ -27,8 +27,8 @@
 
 @layer base {
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+    background-color: #ffffff;
+    color: #14532d;
     transition-property: color, background-color;
     transition-duration: 300ms;
   }
@@ -36,144 +36,101 @@
 
 ::selection {
   background-color: #84cc16;
-  color: #000;
+  color: #fff;
 }
 
 ::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f7fee7; }
 ::-webkit-scrollbar-thumb {
   background-color: #84cc16;
   border-radius: 20px;
 }
 
-/* ── LIQUID GLASS SYSTEM ─────────────────────────────────────── */
+/* ── LIGHT GLASS SYSTEM ─────────────────────────────────────── */
 
 .lg-surface {
-  background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
+  background: rgba(255,255,255,0.82);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.11);
+  border: 1px solid rgba(132,204,22,0.22);
   box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.18),
-    inset 0 -1px 0 rgba(0,0,0,0.12),
-    0 8px 32px rgba(0,0,0,0.28),
-    0 2px 8px rgba(0,0,0,0.14);
+    inset 0 1.5px 0 rgba(255,255,255,1),
+    0 4px 24px rgba(132,204,22,0.08),
+    0 2px 8px rgba(0,0,0,0.04);
 }
 
-/* Neutral glass button */
 .lg-btn {
   position: relative;
-  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%);
+  background: rgba(255,255,255,0.90);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.13);
-  box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.22),
-    inset 0 -1px 0 rgba(0,0,0,0.14),
-    0 4px 16px rgba(0,0,0,0.22);
+  border: 1px solid rgba(132,204,22,0.25);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  color: #14532d;
   transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease, border-color 0.22s ease;
 }
 .lg-btn:hover {
-  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.09) 100%);
-  border-color: rgba(132,204,22,0.30);
-  box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.28),
-    inset 0 -1px 0 rgba(0,0,0,0.10),
-    0 8px 28px rgba(132,204,22,0.16);
+  border-color: rgba(132,204,22,0.52);
+  box-shadow: 0 6px 24px rgba(132,204,22,0.20);
   transform: translateY(-1px);
 }
-.lg-btn:active { transform: translateY(0px) scale(0.98); }
+.lg-btn:active { transform: translateY(0) scale(0.98); }
 
-/* Primary glass button — green tint */
 .lg-btn-accent {
   position: relative;
-  background: linear-gradient(135deg, rgba(132,204,22,0.30) 0%, rgba(101,163,13,0.18) 100%);
-  backdrop-filter: blur(24px) saturate(200%);
-  -webkit-backdrop-filter: blur(24px) saturate(200%);
-  border: 1px solid rgba(132,204,22,0.42);
-  box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.28),
-    inset 0 -1px 0 rgba(0,50,0,0.22),
-    0 4px 20px rgba(132,204,22,0.22),
-    0 8px 40px rgba(0,0,0,0.26);
+  background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+  border: 1px solid rgba(132,204,22,0.30);
+  box-shadow: 0 4px 20px rgba(132,204,22,0.35), 0 2px 8px rgba(0,0,0,0.08);
   color: white;
-  transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease, border-color 0.22s ease;
+  transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease;
 }
 .lg-btn-accent:hover {
-  background: linear-gradient(135deg, rgba(132,204,22,0.42) 0%, rgba(101,163,13,0.28) 100%);
-  border-color: rgba(132,204,22,0.60);
-  box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.34),
-    inset 0 -1px 0 rgba(0,50,0,0.18),
-    0 8px 32px rgba(132,204,22,0.32),
-    0 16px 48px rgba(0,0,0,0.30);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
+  box-shadow: 0 8px 32px rgba(132,204,22,0.45), 0 4px 16px rgba(0,0,0,0.10);
+  transform: translateY(-2px);
 }
-.lg-btn-accent:active { transform: translateY(0px) scale(0.98); }
+.lg-btn-accent:active { transform: translateY(0) scale(0.98); }
 
-/* Yellow accent button */
 .lg-btn-yellow {
   position: relative;
-  background: linear-gradient(135deg, rgba(250,204,21,0.30) 0%, rgba(234,179,8,0.18) 100%);
-  backdrop-filter: blur(24px) saturate(200%);
-  -webkit-backdrop-filter: blur(24px) saturate(200%);
-  border: 1px solid rgba(250,204,21,0.42);
-  box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.28),
-    inset 0 -1px 0 rgba(80,50,0,0.22),
-    0 4px 20px rgba(250,204,21,0.22),
-    0 8px 40px rgba(0,0,0,0.26);
-  color: white;
-  transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease, border-color 0.22s ease;
+  background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+  border: 1px solid rgba(250,204,21,0.30);
+  box-shadow: 0 4px 20px rgba(250,204,21,0.35), 0 2px 8px rgba(0,0,0,0.08);
+  color: #1a2e05;
+  font-weight: 900;
+  transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease;
 }
 .lg-btn-yellow:hover {
-  background: linear-gradient(135deg, rgba(250,204,21,0.44) 0%, rgba(234,179,8,0.28) 100%);
-  border-color: rgba(250,204,21,0.60);
-  box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.34),
-    0 8px 32px rgba(250,204,21,0.28),
-    0 16px 48px rgba(0,0,0,0.30);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+  box-shadow: 0 8px 32px rgba(250,204,21,0.45);
+  transform: translateY(-2px);
 }
+.lg-btn-yellow:active { transform: translateY(0) scale(0.98); }
 
-/* Info badge / pill — green tint */
 .lg-badge {
-  background: linear-gradient(135deg, rgba(132,204,22,0.16) 0%, rgba(132,204,22,0.06) 100%);
+  background: rgba(132,204,22,0.12);
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid rgba(132,204,22,0.28);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.16),
-    0 2px 12px rgba(132,204,22,0.12);
+  border: 1px solid rgba(132,204,22,0.25);
+  box-shadow: 0 2px 12px rgba(132,204,22,0.10);
 }
 
-/* Yellow badge */
 .lg-badge-yellow {
-  background: linear-gradient(135deg, rgba(250,204,21,0.16) 0%, rgba(250,204,21,0.06) 100%);
+  background: rgba(250,204,21,0.14);
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
   border: 1px solid rgba(250,204,21,0.28);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.16),
-    0 2px 12px rgba(250,204,21,0.10);
+  box-shadow: 0 2px 12px rgba(250,204,21,0.10);
 }
 
-/* Dark card */
 .lg-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid rgba(255,255,255,0.09);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.12),
-    0 4px 24px rgba(0,0,0,0.30);
+  background: #ffffff;
+  border: 1px solid rgba(132,204,22,0.15);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
   transition: box-shadow 0.28s ease, border-color 0.28s ease, transform 0.24s ease;
 }
 .lg-card:hover {
-  border-color: rgba(132,204,22,0.28);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.16),
-    0 0 0 1px rgba(132,204,22,0.12),
-    0 8px 40px rgba(132,204,22,0.14),
-    0 16px 48px rgba(0,0,0,0.36);
-  transform: translateY(-2px);
+  border-color: rgba(132,204,22,0.40);
+  box-shadow: 0 12px 48px rgba(132,204,22,0.16), 0 4px 16px rgba(0,0,0,0.06);
+  transform: translateY(-3px);
 }

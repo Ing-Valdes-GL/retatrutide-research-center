@@ -1,68 +1,123 @@
-// app/category/[slug]/page.tsx
 import { supabase } from '@/lib/supabase'
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+import Link from 'next/link'
+import { Shield, ShoppingCart, ArrowRight } from 'lucide-react'
 
-export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
-  // Correction : Attendre que les paramètres soient résolus
-  const resolvedParams = await params;
-  const slug = resolvedParams.slug;
+export default async function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
+  const id = resolvedParams.id
 
-  // Requête Supabase filtrant par le slug de la catégorie et le stock disponible
+  const { data: category } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('id', id)
+    .single()
+
   const { data: products } = await supabase
     .from('products')
-    .select('*, categories!inner(*)')
-    .eq('categories.slug', slug)
-    .gt('stock_quantity', 0); // Filtre pour n'afficher que les produits en stock
+    .select('*')
+    .eq('category_id', id)
+    .gt('stock', 0)
+
+  const categoryName = category?.name || id?.replace(/-/g, ' ')
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white text-[#14532d]">
       <Header />
-      
-      {/* SECTION BANNIÈRE (Style image_2e82e0.png) */}
-      <div className="bg-[#FFF5EB] py-20 text-center">
-        <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">
-           {/* Correction : Sécurisation de la chaîne de caractères */}
-           {slug ? slug.replace(/-/g, ' & ') : 'Category'}
-        </h1>
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-           Shop / {slug}
-        </p>
-      </div>
 
-      <div className="container mx-auto px-4 py-20">
-        {/* Affichage "Nothing Found" si aucun produit n'est en stock (image_2e82e0.png) */}
-        {(!products || products.length === 0) ? (
-          <div className="text-center py-20">
-            <h2 className="text-6xl font-black tracking-tighter text-gray-900 mb-4 uppercase">Nothing Found</h2>
-            <p className="text-gray-400 font-medium">No products available in this category for now.</p>
+      {/* Banner */}
+      <section className="pt-20 pb-14 text-center relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #f7fee7 0%, #ffffff 60%, #fefce8 100%)' }}>
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle, #84cc16 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        <div className="container mx-auto px-6 relative z-10">
+          <p className="text-[11px] uppercase tracking-[0.35em] font-black mb-4" style={{ color: '#65a30d' }}>Catalogue</p>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4 capitalize"
+            style={{ color: '#1a2e05', letterSpacing: '-0.03em' }}>
+            {categoryName}
+          </h1>
+          <nav className="text-[10px] uppercase tracking-[0.25em] font-black flex items-center justify-center gap-2" style={{ color: '#9ca3af' }}>
+            <Link href="/products" className="hover:text-[#65a30d] transition-colors">Shop</Link>
+            <span>/</span>
+            <span style={{ color: '#1a2e05' }}>{categoryName}</span>
+          </nav>
+        </div>
+      </section>
+
+      <main className="container mx-auto px-6 py-16 pb-24">
+        {!products || products.length === 0 ? (
+          <div className="py-32 text-center">
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
+              style={{ background: '#f7fee7', border: '1.5px solid rgba(132,204,22,0.20)' }}>
+              <ShoppingCart size={32} className="text-[#84cc16]" />
+            </div>
+            <h2 className="text-2xl font-black mb-3" style={{ color: '#1a2e05' }}>Nothing found</h2>
+            <p className="text-[#6b7280] text-sm mb-8">No products available in this category right now.</p>
+            <Link href="/products"
+              className="lg-btn-accent inline-flex items-center gap-2 px-8 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest">
+              Browse All Products <ArrowRight size={14} />
+            </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {products.map((product) => (
-              <div key={product.id} className="group border border-gray-100 rounded-xl overflow-hidden hover:shadow-xl transition-all">
-                <div className="aspect-square bg-[#F5F5F5] p-8 flex items-center justify-center">
-                  <img 
-                    src={product.main_image_url} 
-                    alt={product.name} 
-                    className="w-full h-full object-contain mix-blend-multiply" 
-                  />
+          <>
+            <p className="text-[#9ca3af] text-[11px] font-black uppercase tracking-widest mb-10">
+              {products.length} product{products.length !== 1 ? 's' : ''} found
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {products.map((product: any) => (
+                <div
+                  key={product.id}
+                  className="group lg-card rounded-2xl overflow-hidden flex flex-col"
+                >
+                  {/* Image */}
+                  <Link href={`/products/${product.id}`}
+                    className="relative aspect-square overflow-hidden flex items-center justify-center p-8"
+                    style={{ background: '#f7fee7' }}>
+                    <img
+                      src={product.main_image_url || '/placeholder.png'}
+                      className="max-h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      alt={product.name}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest text-[#1a2e05]"
+                        style={{ background: 'rgba(255,255,255,0.90)', border: '1px solid rgba(132,204,22,0.25)', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
+                        View Details
+                      </span>
+                    </div>
+                  </Link>
+
+                  {/* Info */}
+                  <div className="p-6 flex flex-col flex-grow">
+                    <div className="flex items-center gap-1.5 mb-3 w-fit px-2.5 py-1 rounded-lg lg-badge">
+                      <Shield size={11} className="text-[#65a30d]" />
+                      <span className="text-[9px] font-black uppercase tracking-wider text-[#65a30d]">Certified RRC</span>
+                    </div>
+
+                    <Link href={`/products/${product.id}`}>
+                      <h3 className="font-black text-[#1a2e05] text-base mb-2 leading-tight group-hover:text-[#65a30d] transition-colors line-clamp-2">
+                        {product.name}
+                      </h3>
+                    </Link>
+
+                    <div className="mt-auto pt-4">
+                      <p className="font-black text-2xl mb-4" style={{ color: '#ca8a04' }}>£{product.price}</p>
+                      <Link
+                        href={`/products/${product.id}`}
+                        className="w-full lg-btn-accent py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2"
+                      >
+                        <ShoppingCart size={14} /> View Product
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="font-bold text-sm mb-3 group-hover:text-orange-600 transition-colors uppercase">
-                    {product.name}
-                  </h3>
-                  <p className="text-[#9C27B0] font-black text-lg mb-4">
-                    £{product.price}
-                  </p>
-                  <button className="w-full border border-gray-200 py-3 rounded-md text-[11px] font-black uppercase flex items-center justify-center gap-2 hover:bg-black hover:text-white transition-all">
-                    Add To Cart
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
-      </div>
+      </main>
+
+      <Footer />
     </div>
   )
 }

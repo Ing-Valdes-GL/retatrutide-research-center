@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Header from '@/components/Header'
@@ -8,141 +9,103 @@ import Footer from '@/components/Footer'
 import LegalModal from '@/components/legal/LegalModal'
 import PrivacyContent from '@/components/legal/PrivacyContent'
 import RefundContent from '@/components/legal/RefundContent'
-import { User, CreditCard, Apple, Banknote, Bitcoin, X, Mail, CheckSquare, Square } from 'lucide-react'
+import { User, CreditCard, Apple, Banknote, Bitcoin, X, Mail, CheckSquare, ArrowRight, Lock, ShieldCheck } from 'lucide-react'
+
+const inputCls = (error?: boolean) =>
+  `w-full px-4 py-3.5 rounded-xl text-sm font-medium outline-none transition-all text-[#1a2e05] placeholder:text-[#9ca3af] ${
+    error
+      ? 'bg-red-50 border-red-300'
+      : 'bg-[#f7fee7] border-[rgba(132,204,22,0.22)] focus:border-[rgba(132,204,22,0.55)]'
+  }`
+const inputStyle = { border: '1.5px solid' }
 
 export default function CheckoutPage() {
   const router = useRouter()
   const [cartItems, setCartItems] = useState<any[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, boolean>>({})
-  
-  // États pour le Modal d'Authentification
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
   const [authMessage, setAuthMessage] = useState('')
-
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false)
+  const [showRefundModal, setShowRefundModal] = useState(false)
+  const [agreedToPolicies, setAgreedToPolicies] = useState(false)
   const [formData, setFormData] = useState({
     firstName: '', lastName: '', companyName: '',
     country: 'United Kingdom (UK)', streetAddress: '',
     apartment: '', townCity: '', county: '',
     postcode: '', phone: '', email: '',
-    paymentMethod: 'bank_transfer'
+    paymentMethod: 'bank_transfer',
   })
-  
-  // Legal compliance states
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false)
-  const [showRefundModal, setShowRefundModal] = useState(false)
-  const [agreedToPolicies, setAgreedToPolicies] = useState(false)
 
   useEffect(() => {
-    // Restaurer le panier
-    const savedCart = JSON.parse(localStorage.getItem('cart') || '[]')
-    setCartItems(savedCart)
-
-    // Restaurer le formulaire si l'utilisateur revient du Magic Link
+    const saved = JSON.parse(localStorage.getItem('cart') || '[]')
+    setCartItems(saved)
     const savedForm = localStorage.getItem('checkout_form')
-    if (savedForm) {
-      setFormData(JSON.parse(savedForm))
-    }
+    if (savedForm) setFormData(JSON.parse(savedForm))
   }, [])
 
-  const subtotal = cartItems.reduce((acc, item) => acc + (Number(item.price) * Number(item.quantity)), 0)
-  const discount = 30.90 
+  const set = (field: string) => (v: string) => setFormData((f) => ({ ...f, [field]: v }))
+
+  const subtotal = cartItems.reduce((acc, item) => acc + Number(item.price) * Number(item.quantity), 0)
+  const discount = 30.90
   const shipping = 30.00
-  const total = Math.max(0, subtotal - discount + shipping)
+  const total    = Math.max(0, subtotal - discount + shipping)
 
   const validate = () => {
-    const newErrors: Record<string, boolean> = {}
     const required = ['firstName', 'lastName', 'streetAddress', 'townCity', 'postcode', 'phone', 'email']
-    required.forEach(field => {
-      if (!formData[field as keyof typeof formData]) newErrors[field] = true
-    })
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    const newErr: Record<string, boolean> = {}
+    required.forEach((f) => { if (!formData[f as keyof typeof formData]) newErr[f] = true })
+    setErrors(newErr)
+    return Object.keys(newErr).length === 0
   }
 
   const handlePlaceOrder = async () => {
-    if (!validate()) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
+    if (!validate()) { alert('Please fill in all required fields.'); return }
+    if (!agreedToPolicies) { alert('Please agree to the policies.'); return }
     setIsSubmitting(true)
-
     try {
-      // 1. Vérifier si l'utilisateur est connecté
       const { data: { user } } = await supabase.auth.getUser()
-
       if (!user) {
-        // NON CONNECTÉ -> Sauvegarde et Popup
         localStorage.setItem('checkout_form', JSON.stringify(formData))
         setShowAuthModal(true)
         setIsSubmitting(false)
         return
       }
-
-      // 2. CONNECTÉ -> INSERTION COMMANDE
-      const { data: order, error: orderErr } = await supabase
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          company_name: formData.companyName,
-          country: formData.country,
-          street_address: formData.streetAddress,
-          apartment_suite: formData.apartment,
-          town_city: formData.townCity,
-          county: formData.county,
-          postcode: formData.postcode,
-          phone: formData.phone,
-          email_address: formData.email,
-          payment_method: formData.paymentMethod,
-          subtotal: subtotal,
-          discount_amount: discount,
-          shipping_fee: shipping,
-          total_amount: total,
-          status: 'on_hold'
-        })
-        .select().single()
-
+      const { data: order, error: orderErr } = await supabase.from('orders').insert({
+        user_id: user.id,
+        first_name: formData.firstName, last_name: formData.lastName,
+        company_name: formData.companyName, country: formData.country,
+        street_address: formData.streetAddress, apartment_suite: formData.apartment,
+        town_city: formData.townCity, county: formData.county,
+        postcode: formData.postcode, phone: formData.phone,
+        email_address: formData.email, payment_method: formData.paymentMethod,
+        subtotal, discount_amount: discount, shipping_fee: shipping,
+        total_amount: total, status: 'on_hold',
+      }).select().single()
       if (orderErr) throw orderErr
-
-      // 3. ARTICLES DU PANIER
-      const itemsToInsert = cartItems.map(item => ({
-        order_id: order.id,
-        product_name: item.name,
-        quantity: parseInt(item.quantity),
-        unit_price: parseFloat(item.price)
-      }))
-
-      const { error: itemsErr } = await supabase.from('order_items').insert(itemsToInsert)
-      if (itemsErr) throw itemsErr
-
-      // 4. ENVOI DE L'EMAIL (API Route)
+      await supabase.from('order_items').insert(
+        cartItems.map((item) => ({
+          order_id: order.id, product_name: item.name,
+          quantity: parseInt(item.quantity), unit_price: parseFloat(item.price),
+        }))
+      )
       fetch('/api/send-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
+          email: formData.email, firstName: formData.firstName, lastName: formData.lastName,
           orderRef: order.reference_code || order.id.slice(0, 8).toUpperCase(),
           date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-          items: cartItems,
-          subtotal, discount, shipping, total,
-          paymentMethod: formData.paymentMethod,
-          address: formData
-        })
-      }).catch(e => console.error("Email API Error:", e))
-      
-      // 5. NETTOYAGE ET REDIRECTION VERS CHECKOUT2
+          items: cartItems, subtotal, discount, shipping, total,
+          paymentMethod: formData.paymentMethod, address: formData,
+        }),
+      }).catch(console.error)
       localStorage.removeItem('cart')
       localStorage.removeItem('checkout_form')
       router.push(`/checkout2?orderId=${order.id}`)
-
-    } catch (error: any) {
-      alert("Error processing order: " + error.message)
+    } catch (err: any) {
+      alert('Error processing order: ' + err.message)
       setIsSubmitting(false)
     }
   }
@@ -153,10 +116,10 @@ export default function CheckoutPage() {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: formData.email,
-        options: { emailRedirectTo: `${window.location.origin}/checkout` }
+        options: { emailRedirectTo: `${window.location.origin}/checkout` },
       })
       if (error) throw error
-      setAuthMessage('A secure login link has been sent to your email. Click it to continue.')
+      setAuthMessage('A secure login link has been sent. Click it to continue.')
     } catch (err: any) {
       setAuthMessage('Error: ' + err.message)
     } finally {
@@ -165,202 +128,268 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="bg-white min-h-screen font-sans text-slate-900 relative">
+    <div className="min-h-screen bg-white text-[#14532d]">
       <Header />
-      
-      <div className="bg-blue-50 py-16 text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-slate-900">Your Checkout</h1>
-      </div>
 
-      <main className="container mx-auto px-6 py-12 grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <h2 className="text-xl font-bold mb-8 border-b pb-4">Billing Information</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InputField label="First name *" error={errors.firstName} value={formData.firstName} onChange={(v:any) => setFormData({...formData, firstName: v})} />
-            <InputField label="Last name *" error={errors.lastName} value={formData.lastName} onChange={(v:any) => setFormData({...formData, lastName: v})} />
-          </div>
+      {/* Hero */}
+      <section className="pt-16 pb-10 text-center" style={{ background: 'linear-gradient(135deg, #f7fee7 0%, #ffffff 60%)' }}>
+        <motion.p
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          className="text-[11px] uppercase tracking-[0.35em] font-black mb-3" style={{ color: '#65a30d' }}>
+          Secure Checkout
+        </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.06 }}
+          className="text-4xl font-black tracking-tight" style={{ color: '#1a2e05', letterSpacing: '-0.03em' }}>
+          Your Order
+        </motion.h1>
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+          className="flex items-center justify-center gap-2 mt-4 text-[#4b7c59]">
+          <Lock size={13} />
+          <span className="text-[11px] font-bold uppercase tracking-widest">SSL Encrypted · Secure Payment</span>
+        </motion.div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InputField label="Company (optional)" value={formData.companyName} onChange={(v:any) => setFormData({...formData, companyName: v})} />
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-slate-800">Country *</label>
-              <select className="w-full p-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-sky-300">
-                <option>United Kingdom (UK)</option>
-              </select>
+      <main className="container mx-auto px-6 py-12 pb-24 grid lg:grid-cols-3 gap-10">
+
+        {/* ── LEFT: Billing ── */}
+        <div className="lg:col-span-2 space-y-8">
+          <div className="p-8 rounded-2xl" style={{ border: '1.5px solid rgba(132,204,22,0.15)', boxShadow: '0 2px 16px rgba(0,0,0,0.04)' }}>
+            <h2 className="text-base font-black uppercase tracking-tight mb-8 pb-4" style={{ color: '#1a2e05', borderBottom: '1px solid rgba(132,204,22,0.12)' }}>
+              Billing Information
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Field label="First name *" error={errors.firstName}  value={formData.firstName}    onChange={set('firstName')} />
+              <Field label="Last name *"  error={errors.lastName}   value={formData.lastName}     onChange={set('lastName')} />
+              <Field label="Company (optional)"                      value={formData.companyName}  onChange={set('companyName')} />
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase tracking-widest text-[#4b7c59]">Country *</label>
+                <select
+                  className={inputCls()}
+                  style={{ ...inputStyle, borderColor: 'rgba(132,204,22,0.22)' }}
+                  value={formData.country}
+                  onChange={(e) => setFormData((f) => ({ ...f, country: e.target.value }))}
+                >
+                  <option>United Kingdom (UK)</option>
+                  <option>United States (US)</option>
+                  <option>France</option>
+                  <option>Germany</option>
+                  <option>Australia</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <Field label="Street address *" placeholder="House number and street name" error={errors.streetAddress} value={formData.streetAddress} onChange={set('streetAddress')} />
+              </div>
+              <div className="md:col-span-2">
+                <Field label="Apartment / Suite (optional)" value={formData.apartment} onChange={set('apartment')} />
+              </div>
+              <Field label="Town / City *"   error={errors.townCity}  value={formData.townCity}  onChange={set('townCity')} />
+              <Field label="County / Region"                           value={formData.county}    onChange={set('county')} />
+              <Field label="Postcode *"       error={errors.postcode}  value={formData.postcode}  onChange={set('postcode')} />
+              <div />
+              <Field label="Phone *" error={errors.phone} value={formData.phone} onChange={set('phone')} />
+              <Field label="Email address *" error={errors.email} value={formData.email} onChange={set('email')} />
             </div>
-          </div>
-
-          <InputField label="Street address *" placeholder="House number and street name" error={errors.streetAddress} value={formData.streetAddress} onChange={(v:any) => setFormData({...formData, streetAddress: v})} />
-          <InputField label="Apartment, suite, etc. (optional)" value={formData.apartment} onChange={(v:any) => setFormData({...formData, apartment: v})} />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <InputField label="Town / City *" error={errors.townCity} value={formData.townCity} onChange={(v:any) => setFormData({...formData, townCity: v})} />
-            <InputField label="County/Region" value={formData.county} onChange={(v:any) => setFormData({...formData, county: v})} />
-            <InputField label="Postcode *" error={errors.postcode} value={formData.postcode} onChange={(v:any) => setFormData({...formData, postcode: v})} />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InputField label="Phone *" error={errors.phone} value={formData.phone} onChange={(v:any) => setFormData({...formData, phone: v})} />
-            <InputField label="Email address *" error={errors.email} value={formData.email} onChange={(v:any) => setFormData({...formData, email: v})} />
           </div>
         </div>
 
-        <aside>
-          <div className="bg-[#FFFBF7] p-8 rounded-3xl border border-sky-100 shadow-sm sticky top-24">
-            <h3 className="text-lg font-bold mb-6">Review Your Order</h3>
-            
-            <div className="space-y-4 mb-8">
-               {cartItems.map(item => (
-                 <div key={item.id} className="flex justify-between items-start text-sm">
-                   <div className="flex items-center gap-3">
-                     <img src={item.image_url} className="w-12 h-12 object-contain bg-white rounded-lg border border-slate-100" alt="" />
-                     <div>
-                       <p className="text-slate-700 font-medium leading-tight">{item.name}</p>
-                       <p className="font-bold text-slate-900 mt-1">× {item.quantity}</p>
-                     </div>
-                   </div>
-                   <span className="font-bold">£{(Number(item.price) * Number(item.quantity)).toFixed(2)}</span>
-                 </div>
-               ))}
+        {/* ── RIGHT: Summary ── */}
+        <div className="lg:col-span-1">
+          <div className="rounded-3xl p-8 sticky top-28 relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(145deg, #f0fdf4 0%, #f7fee7 100%)',
+              border: '1.5px solid rgba(132,204,22,0.22)',
+              boxShadow: '0 8px 40px rgba(132,204,22,0.12)',
+            }}>
+            <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl"
+              style={{ background: 'linear-gradient(90deg, #84cc16, #facc15)' }} />
+
+            <h3 className="text-base font-black uppercase tracking-tight mb-6" style={{ color: '#1a2e05' }}>
+              Order Summary
+            </h3>
+
+            {/* Items */}
+            <div className="space-y-4 mb-6 pb-6" style={{ borderBottom: '1px solid rgba(132,204,22,0.12)' }}>
+              {cartItems.map((item) => (
+                <div key={item.id} className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ background: '#fff', border: '1px solid rgba(132,204,22,0.15)' }}>
+                    <img src={item.image_url || item.main_image_url} className="max-h-10 max-w-10 object-contain" alt={item.name} />
+                  </div>
+                  <div className="flex-grow min-w-0">
+                    <p className="text-xs font-bold text-[#1a2e05] leading-tight truncate">{item.name}</p>
+                    <p className="text-[10px] text-[#6b7280] mt-0.5">× {item.quantity}</p>
+                  </div>
+                  <span className="font-black text-sm shrink-0" style={{ color: '#ca8a04' }}>
+                    £{(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                  </span>
+                </div>
+              ))}
             </div>
 
-            <div className="space-y-3 pt-4 border-t border-sky-100 text-sm">
-              <div className="flex justify-between"><span>Subtotal</span><span className="font-bold">£{subtotal.toFixed(2)}</span></div>
-              <div className="flex justify-between text-sky-600 font-medium italic"><span>Discount</span><span>-£{discount.toFixed(2)}</span></div>
-              <div className="flex justify-between"><span>Shipping</span><span className="font-bold">£{shipping.toFixed(2)}</span></div>
-              <div className="flex justify-between text-lg font-black pt-4 border-t border-sky-100">
-                <span>Total</span><span className="text-[#0ea5e9] text-2xl">£{total.toFixed(2)}</span>
+            {/* Totals */}
+            <div className="space-y-3 mb-6 pb-6" style={{ borderBottom: '1px solid rgba(132,204,22,0.12)' }}>
+              {[
+                { label: 'Subtotal', value: `£${subtotal.toFixed(2)}`, color: '#1a2e05' },
+                { label: 'Discount', value: `-£${discount.toFixed(2)}`, color: '#65a30d' },
+                { label: 'Shipping', value: `£${shipping.toFixed(2)}`, color: '#1a2e05' },
+              ].map(({ label, value, color }) => (
+                <div key={label} className="flex justify-between text-sm">
+                  <span className="text-[#6b7280] font-medium">{label}</span>
+                  <span className="font-black" style={{ color }}>{value}</span>
+                </div>
+              ))}
+              <div className="flex justify-between items-end pt-2">
+                <span className="font-black text-sm uppercase tracking-wide text-[#6b7280]">Total</span>
+                <span className="text-3xl font-black" style={{ color: '#1a2e05' }}>£{total.toFixed(2)}</span>
               </div>
             </div>
 
-            <div className="mt-8 space-y-3">
-              <p className="text-sm font-bold text-slate-800 mb-2">Payment Method</p>
-              <PaymentOption id="bank_transfer" label="Bank Transfer" icon={<Banknote size={18}/>} current={formData.paymentMethod} set={(v:any) => setFormData({...formData, paymentMethod: v})} />
-              <PaymentOption id="zelle" label="Zelle" icon={<CreditCard size={18} className="text-purple-600"/>} current={formData.paymentMethod} set={(v:any) => setFormData({...formData, paymentMethod: v})} />
-              <PaymentOption id="apple_pay" label="ApplePay" icon={<Apple size={18} className="text-black fill-current"/>} current={formData.paymentMethod} set={(v:any) => setFormData({...formData, paymentMethod: v})} />
-              <PaymentOption id="crypto" label="Crypto" icon={<Bitcoin size={18} className="text-sky-500"/>} current={formData.paymentMethod} set={(v:any) => setFormData({...formData, paymentMethod: v})} />
+            {/* Payment methods */}
+            <p className="text-[11px] font-black uppercase tracking-widest text-[#6b7280] mb-3">Payment Method</p>
+            <div className="space-y-2 mb-6">
+              {[
+                { id: 'bank_transfer', label: 'Bank Transfer',  icon: <Banknote size={16} className="text-[#65a30d]" /> },
+                { id: 'zelle',         label: 'Zelle',          icon: <CreditCard size={16} className="text-purple-500" /> },
+                { id: 'apple_pay',     label: 'Apple Pay',      icon: <Apple size={16} className="text-[#1a2e05]" /> },
+                { id: 'crypto',        label: 'Cryptocurrency', icon: <Bitcoin size={16} className="text-[#ca8a04]" /> },
+              ].map(({ id, label, icon }) => (
+                <label
+                  key={id}
+                  onClick={() => setFormData((f) => ({ ...f, paymentMethod: id }))}
+                  className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all"
+                  style={{
+                    background: formData.paymentMethod === id ? 'rgba(132,204,22,0.10)' : 'rgba(255,255,255,0.60)',
+                    border: formData.paymentMethod === id ? '1.5px solid rgba(132,204,22,0.40)' : '1.5px solid rgba(132,204,22,0.12)',
+                  }}
+                >
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${formData.paymentMethod === id ? 'border-[#84cc16]' : 'border-[#d1d5db]'}`}>
+                    {formData.paymentMethod === id && <div className="w-2 h-2 bg-[#84cc16] rounded-full" />}
+                  </div>
+                  {icon}
+                  <span className="text-xs font-black uppercase tracking-wider text-[#1a2e05]">{label}</span>
+                </label>
+              ))}
             </div>
 
-            {/* Legal Compliance Checkbox */}
-            <div className="mt-6 pt-6 border-t border-sky-100">
-              <label 
-                className="flex items-start gap-3 cursor-pointer group"
-                onClick={() => setAgreedToPolicies(!agreedToPolicies)}
-              >
-                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${agreedToPolicies ? 'bg-[#0ea5e9] border-[#0ea5e9]' : 'border-slate-300 group-hover:border-[#0ea5e9]'}`}>
-                  {agreedToPolicies && <CheckSquare size={14} className="text-white" />}
+            {/* Legal */}
+            <div className="pb-6 mb-6" style={{ borderBottom: '1px solid rgba(132,204,22,0.12)' }}>
+              <label className="flex items-start gap-3 cursor-pointer" onClick={() => setAgreedToPolicies(!agreedToPolicies)}>
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${agreedToPolicies ? 'bg-[#84cc16] border-[#84cc16]' : 'border-[#d1d5db]'}`}>
+                  {agreedToPolicies && <CheckSquare size={12} className="text-white" />}
                 </div>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  I have read and agree to the{' '}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setShowPrivacyModal(true)
-                    }}
-                    className="text-[#0ea5e9] font-bold underline decoration-2 underline-offset-2 hover:text-[#1e3a8a] transition-colors"
-                  >
+                <p className="text-xs text-[#4b7c59] leading-relaxed">
+                  I agree to the{' '}
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setShowPrivacyModal(true) }}
+                    className="font-bold underline decoration-2 underline-offset-2 text-[#65a30d] hover:text-[#84cc16]">
                     Privacy Policy
-                  </button>
-                  {' '}and{' '}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setShowRefundModal(true)
-                    }}
-                    className="text-[#0ea5e9] font-bold underline decoration-2 underline-offset-2 hover:text-[#1e3a8a] transition-colors"
-                  >
+                  </button>{' '}and{' '}
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setShowRefundModal(true) }}
+                    className="font-bold underline decoration-2 underline-offset-2 text-[#65a30d] hover:text-[#84cc16]">
                     Refund Policy
                   </button>
-                  . I understand that all research compounds are for laboratory use only and acknowledge the strict no-return policy.
+                  . Research compounds are for lab use only.
                 </p>
               </label>
-              {!agreedToPolicies && (
-                <p className="text-xs text-red-500 mt-2 ml-8">You must agree to the policies to complete your purchase.</p>
-              )}
             </div>
 
-            <button 
+            <button
               onClick={handlePlaceOrder}
               disabled={isSubmitting || !agreedToPolicies}
-              className="w-full bg-[#0ea5e9] text-white py-4 rounded-2xl font-bold mt-6 hover:bg-sky-600 transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full lg-btn-accent py-4 rounded-2xl font-black uppercase text-[11px] tracking-[0.15em] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Processing...' : 'Place Order'}
+              {isSubmitting ? 'Processing…' : (
+                <>
+                  Place Order
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </button>
-          </div>
-        </aside>
-      </main>
-      <Footer />
 
-      {/* POPUP AUTH */}
-      {showAuthModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full relative shadow-2xl">
-            <button onClick={() => setShowAuthModal(false)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-900">
-              <X size={20} />
-            </button>
-            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-6 text-[#FFA52F]">
-              <Mail size={24} />
-            </div>
-            <h3 className="text-2xl font-black mb-2">Secure Your Order</h3>
-            <p className="text-slate-500 text-sm mb-6">Verify your identity via email to complete your purchase.</p>
-            <div className="space-y-4">
-              <input type="email" readOnly value={formData.email} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-500" />
-              {authMessage && <div className="p-4 rounded-xl bg-green-50 text-green-700 text-sm border border-green-200">{authMessage}</div>}
-              <button onClick={handleRequestMagicLink} disabled={authLoading} className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-[#FFA52F] transition-all disabled:opacity-50">
-                {authLoading ? 'Sending...' : 'Request login link'}
-              </button>
+            <div className="flex items-center justify-center gap-2 mt-4 text-[#9ca3af]">
+              <ShieldCheck size={13} />
+              <span className="text-[10px] font-bold uppercase tracking-widest">Secure & encrypted</span>
             </div>
           </div>
         </div>
-      )}
+      </main>
 
-      {/* Privacy Policy Modal */}
-      <LegalModal
-        isOpen={showPrivacyModal}
-        onClose={() => setShowPrivacyModal(false)}
-        title="Privacy Policy"
-      >
+      <Footer />
+
+      {/* Auth Modal */}
+      <AnimatePresence>
+        {showAuthModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50"
+              onClick={() => setShowAuthModal(false)}
+            />
+            <div className="fixed inset-0 z-[51] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.94, y: 20 }}
+                transition={{ type: 'spring' as const, bounce: 0.3, duration: 0.5 }}
+                className="bg-white rounded-3xl p-8 max-w-md w-full relative shadow-2xl"
+                style={{ border: '1.5px solid rgba(132,204,22,0.22)' }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl"
+                  style={{ background: 'linear-gradient(90deg, #84cc16, #facc15)' }} />
+                <button onClick={() => setShowAuthModal(false)}
+                  className="absolute top-6 right-6 text-[#9ca3af] hover:text-[#1a2e05] transition-colors">
+                  <X size={20} />
+                </button>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-6" style={{ background: '#f0fdf4', border: '1.5px solid rgba(132,204,22,0.22)' }}>
+                  <Mail size={22} className="text-[#65a30d]" />
+                </div>
+                <h3 className="text-2xl font-black mb-2 tracking-tight" style={{ color: '#1a2e05' }}>Secure Your Order</h3>
+                <p className="text-[#4b7c59] text-sm mb-6">Verify your identity via email to complete your purchase.</p>
+                <div className="space-y-4">
+                  <input type="email" readOnly value={formData.email}
+                    className="w-full p-4 rounded-xl text-sm text-[#6b7280]"
+                    style={{ background: '#f7fee7', border: '1.5px solid rgba(132,204,22,0.20)' }} />
+                  {authMessage && (
+                    <div className="p-4 rounded-xl text-sm" style={{ background: '#f0fdf4', border: '1px solid rgba(132,204,22,0.20)', color: '#14532d' }}>
+                      {authMessage}
+                    </div>
+                  )}
+                  <button onClick={handleRequestMagicLink} disabled={authLoading}
+                    className="w-full lg-btn-accent py-4 rounded-xl font-black uppercase text-[11px] tracking-widest disabled:opacity-50">
+                    {authLoading ? 'Sending…' : 'Send Login Link'}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <LegalModal isOpen={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} title="Privacy Policy">
         <PrivacyContent />
       </LegalModal>
-
-      {/* Refund Policy Modal */}
-      <LegalModal
-        isOpen={showRefundModal}
-        onClose={() => setShowRefundModal(false)}
-        title="Refund & Return Policy"
-      >
+      <LegalModal isOpen={showRefundModal} onClose={() => setShowRefundModal(false)} title="Refund & Return Policy">
         <RefundContent />
       </LegalModal>
     </div>
   )
 }
 
-function InputField({ label, placeholder, error, value, onChange }: any) {
+function Field({ label, placeholder, error, value, onChange }: any) {
   return (
-    <div className="space-y-1 flex-1">
-      <label className="text-sm font-bold text-slate-800">{label}</label>
-      <input 
+    <div className="space-y-1.5">
+      <label className="text-[11px] font-black uppercase tracking-widest text-[#4b7c59]">{label}</label>
+      <input
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full p-3 rounded-xl border transition-all text-sm outline-none ${error ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-white focus:border-orange-300'}`}
+        className={inputCls(error)}
+        style={{ ...inputStyle, borderColor: error ? '#fca5a5' : 'rgba(132,204,22,0.22)' }}
       />
     </div>
-  )
-}
-
-function PaymentOption({ id, label, icon, current, set }: any) {
-  const active = current === id;
-  return (
-    <label onClick={() => set(id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${active ? 'border-orange-500 bg-orange-50' : 'border-slate-100 hover:border-slate-300'}`}>
-      <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${active ? 'border-orange-500' : 'border-slate-300'}`}>
-        {active && <div className="w-2 h-2 bg-orange-500 rounded-full" />}
-      </div>
-      {icon}
-      <span className="text-xs font-bold text-slate-700">{label}</span>
-    </label>
   )
 }

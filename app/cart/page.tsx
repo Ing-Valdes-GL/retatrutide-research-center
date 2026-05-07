@@ -1,233 +1,283 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { Trash2, Plus, Minus, ArrowRight, X } from 'lucide-react'
+import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, Package } from 'lucide-react'
+import Link from 'next/link'
 
 export default function CartPage() {
   const router = useRouter()
   const [cartItems, setCartItems] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  
-  // État pour les informations de livraison
   const [shippingInfo, setShippingInfo] = useState({
     country: 'United Kingdom (UK)',
     county: '',
     townCity: '',
-    postcode: ''
+    postcode: '',
   })
 
-  // Chargement du panier local au montage du composant
   useEffect(() => {
-    const loadLocalCart = () => {
-      const savedCart = JSON.parse(localStorage.getItem('cart') || '[]')
-      setCartItems(savedCart)
-      setLoading(false)
-    }
-    loadLocalCart()
+    const saved = JSON.parse(localStorage.getItem('cart') || '[]')
+    setCartItems(saved)
+    setLoading(false)
   }, [])
 
-  // Mise à jour de la quantité
-  const updateQuantity = (productId: string, delta: number) => {
-    const updatedCart = cartItems.map(item => {
-      if (item.id === productId) {
-        const newQty = Math.max(1, item.quantity + delta)
-        return { ...item, quantity: newQty }
-      }
-      return item
-    })
-    saveCart(updatedCart)
+  const updateQuantity = (id: string, delta: number) => {
+    const updated = cartItems.map((item) =>
+      item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
+    )
+    saveCart(updated)
   }
 
-  // Suppression d'un article
-  const removeItem = (productId: string) => {
-    const updatedCart = cartItems.filter(item => item.id !== productId)
-    saveCart(updatedCart)
-  }
+  const removeItem = (id: string) => saveCart(cartItems.filter((item) => item.id !== id))
 
-  // Sauvegarde globale du panier
   const saveCart = (newCart: any[]) => {
     setCartItems(newCart)
     localStorage.setItem('cart', JSON.stringify(newCart))
-    // Notifier les autres composants (comme le badge du Header)
     window.dispatchEvent(new Event('cart-updated'))
   }
 
-  // Calculs financiers
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
-  const shippingCost = 30.00
-  const total = subtotal + shippingCost
+  const subtotal    = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
+  const shipping    = subtotal >= 100 ? 0 : 30
+  const total       = subtotal + shipping
 
-  // Fonction de redirection vers le checkout
-  const handleProceedToCheckout = () => {
-    if (cartItems.length === 0) {
-      alert("Your cart is empty.")
-      return
-    }
-    // On peut aussi passer les infos de shipping via le state ou le localStorage si besoin
-    router.push('/checkout')
-  }
+  const inputCls = "w-full px-4 py-3 rounded-xl text-sm font-medium outline-none text-[#1a2e05] placeholder:text-[#9ca3af] transition-all"
+  const inputStyle = { background: '#f7fee7', border: '1.5px solid rgba(132,204,22,0.20)' }
 
   return (
-    <div className="bg-[#050505] min-h-screen text-white font-sans">
+    <div className="min-h-screen bg-white text-[#14532d]">
       <Header />
 
-      {/* Hero Header */}
-      <div className="py-16 text-center border-b border-white/5 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]"
-          style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-        <h1 className="text-4xl font-bold tracking-tight text-white relative z-10">Your Cart</h1>
-        <p className="text-white/40 text-sm mt-2 font-medium relative z-10">Review your items before secure checkout</p>
-      </div>
+      {/* Page header */}
+      <section className="pt-20 pb-12 text-center relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #f7fee7 0%, #ffffff 60%)' }}>
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle, #84cc16 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.p
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring' as const, bounce: 0.3, duration: 0.8 }}
+            className="text-[11px] uppercase tracking-[0.35em] font-black mb-3" style={{ color: '#65a30d' }}>
+            Your Selection
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring' as const, bounce: 0.25, duration: 0.9, delay: 0.06 }}
+            className="text-4xl md:text-5xl font-black tracking-tight" style={{ color: '#1a2e05', letterSpacing: '-0.03em' }}>
+            Cart
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ delay: 0.15 }}
+            className="text-[#4b7c59] text-sm mt-2">
+            Review your items before secure checkout
+          </motion.p>
+        </div>
+      </section>
 
-      <main className="container mx-auto px-6 py-12">
-        <div className="grid lg:grid-cols-3 gap-12">
-
-          {/* LEFT: Products + Shipping */}
-          <div className="lg:col-span-2 space-y-12">
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/5 text-left">
-                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-white/30">Product</th>
-                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-white/30">Price</th>
-                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-white/30 text-center">Quantity</th>
-                    <th className="pb-4 font-semibold uppercase text-[10px] tracking-widest text-white/30">Subtotal</th>
-                    <th className="pb-4"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {cartItems.map((item) => (
-                    <tr key={item.id} className="group">
-                      <td className="py-6 flex items-center gap-4">
-                        <div className="w-16 h-16 bg-white/5 rounded-lg p-1 flex items-center justify-center border border-white/8">
-                          <img
-                            src={item.image_url || item.main_image_url}
-                            className="max-h-full max-w-full object-contain"
-                            alt={item.name}
-                          />
-                        </div>
-                        <span className="font-medium text-white text-sm">{item.name}</span>
-                      </td>
-                      <td className="py-6 text-sm text-white/50 font-medium">£{item.price.toFixed(2)}</td>
-                      <td className="py-6">
-                        <div className="flex items-center justify-between lg-surface rounded-md px-2 py-1.5 w-24 mx-auto">
-                          <button onClick={() => updateQuantity(item.id, -1)} className="text-white/40 hover:text-[#0ea5e9] transition-colors">
-                            <Minus size={14}/>
-                          </button>
-                          <span className="text-sm font-semibold text-white">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, 1)} className="text-white/40 hover:text-[#0ea5e9] transition-colors">
-                            <Plus size={14}/>
-                          </button>
-                        </div>
-                      </td>
-                      <td className="py-6 font-bold text-sm text-white">£{(item.price * item.quantity).toFixed(2)}</td>
-                      <td className="py-6 text-right">
-                        <button onClick={() => removeItem(item.id)} className="text-white/20 hover:text-red-400 transition-colors">
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {cartItems.length === 0 && (
-                <div className="py-12 text-center text-white/30 text-sm italic">
-                  Your cart is currently empty.
-                </div>
-              )}
+      <main className="container mx-auto px-6 py-12 pb-24">
+        {loading ? (
+          <div className="py-24 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full border-2 border-[#84cc16] border-t-transparent animate-spin" />
+          </div>
+        ) : cartItems.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+            className="py-32 text-center"
+          >
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
+              style={{ background: '#f7fee7', border: '1.5px solid rgba(132,204,22,0.20)' }}>
+              <ShoppingBag size={32} className="text-[#84cc16]" />
             </div>
+            <h2 className="text-2xl font-black mb-3" style={{ color: '#1a2e05' }}>Your cart is empty</h2>
+            <p className="text-[#6b7280] text-sm mb-8">Start exploring our research-grade compounds.</p>
+            <Link href="/products" className="lg-btn-accent inline-flex items-center gap-2 px-8 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest">
+              Browse Products <ArrowRight size={14} />
+            </Link>
+          </motion.div>
+        ) : (
+          <div className="grid lg:grid-cols-3 gap-12">
 
-            {/* SHIPPING */}
-            <div className="pt-8 border-t border-white/5">
-              <h3 className="text-lg font-bold mb-6 text-white">Shipping Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                   <select
-                    className="w-full lg-surface text-white rounded-lg px-4 py-3 text-sm outline-none focus:border-[#0ea5e9]/50 transition-all appearance-none"
-                    value={shippingInfo.country}
-                    onChange={(e) => setShippingInfo({...shippingInfo, country: e.target.value})}
-                   >
-                     <option className="bg-[#0a0a0f]">United Kingdom (UK)</option>
-                     <option className="bg-[#0a0a0f]">United States (US)</option>
-                     <option className="bg-[#0a0a0f]">France</option>
-                   </select>
-                </div>
-                <input type="text" placeholder="County"
-                  className="lg-surface text-white rounded-lg px-4 py-3 text-sm outline-none placeholder:text-white/25 focus:border-[#0ea5e9]/50"
-                  value={shippingInfo.county}
-                  onChange={(e) => setShippingInfo({...shippingInfo, county: e.target.value})} />
-                <input type="text" placeholder="Town / City"
-                  className="lg-surface text-white rounded-lg px-4 py-3 text-sm outline-none placeholder:text-white/25 focus:border-[#0ea5e9]/50"
-                  value={shippingInfo.townCity}
-                  onChange={(e) => setShippingInfo({...shippingInfo, townCity: e.target.value})} />
-                <input type="text" placeholder="Postcode"
-                  className="lg-surface text-white rounded-lg px-4 py-3 text-sm outline-none placeholder:text-white/25 focus:border-[#0ea5e9]/50"
-                  value={shippingInfo.postcode}
-                  onChange={(e) => setShippingInfo({...shippingInfo, postcode: e.target.value})} />
-                <div className="flex items-center">
-                  <button className="lg-btn-accent px-8 py-3 rounded-lg font-bold text-xs uppercase tracking-widest text-white">
+            {/* ── LEFT COLUMN ── */}
+            <div className="lg:col-span-2 space-y-4">
+              <AnimatePresence>
+                {cartItems.map((item, i) => (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20, height: 0 }}
+                    transition={{ type: 'spring' as const, bounce: 0.2, duration: 0.5, delay: i * 0.04 }}
+                    className="flex items-center gap-6 p-6 rounded-2xl"
+                    style={{ background: '#fff', border: '1.5px solid rgba(132,204,22,0.14)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
+                  >
+                    {/* Image */}
+                    <div className="w-20 h-20 rounded-xl flex items-center justify-center shrink-0 p-2"
+                      style={{ background: '#f7fee7', border: '1px solid rgba(132,204,22,0.15)' }}>
+                      <img src={item.image_url || item.main_image_url} className="max-h-full max-w-full object-contain" alt={item.name} />
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-grow min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: '#65a30d' }}>
+                        {item.category_name || 'Research Grade'}
+                      </p>
+                      <h3 className="font-black text-[#1a2e05] text-sm leading-tight truncate">{item.name}</h3>
+                      <p className="font-black text-lg mt-1" style={{ color: '#ca8a04' }}>£{item.price.toFixed(2)}</p>
+                    </div>
+
+                    {/* Quantity */}
+                    <div className="flex items-center gap-3 shrink-0">
+                      <button
+                        onClick={() => updateQuantity(item.id, -1)}
+                        className="w-8 h-8 rounded-full flex items-center justify-center transition-all lg-btn"
+                      >
+                        <Minus size={13} />
+                      </button>
+                      <span className="text-base font-black min-w-[1.5rem] text-center" style={{ color: '#1a2e05' }}>
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item.id, 1)}
+                        className="w-8 h-8 rounded-full flex items-center justify-center transition-all lg-btn"
+                      >
+                        <Plus size={13} />
+                      </button>
+                    </div>
+
+                    {/* Subtotal */}
+                    <p className="font-black text-base shrink-0 min-w-[4rem] text-right" style={{ color: '#1a2e05' }}>
+                      £{(item.price * item.quantity).toFixed(2)}
+                    </p>
+
+                    {/* Remove */}
+                    <button onClick={() => removeItem(item.id)}
+                      className="text-[#d1d5db] hover:text-red-400 transition-colors shrink-0 ml-2">
+                      <Trash2 size={16} />
+                    </button>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {/* Shipping form */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-8 p-8 rounded-2xl"
+                style={{ background: '#f7fee7', border: '1.5px solid rgba(132,204,22,0.15)' }}
+              >
+                <h3 className="text-base font-black uppercase tracking-tight mb-6" style={{ color: '#1a2e05' }}>
+                  Shipping Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <select
+                      className={inputCls}
+                      style={inputStyle}
+                      value={shippingInfo.country}
+                      onChange={(e) => setShippingInfo({ ...shippingInfo, country: e.target.value })}
+                    >
+                      <option>United Kingdom (UK)</option>
+                      <option>United States (US)</option>
+                      <option>France</option>
+                      <option>Germany</option>
+                      <option>Australia</option>
+                    </select>
+                  </div>
+                  {[
+                    { placeholder: 'County',      key: 'county' },
+                    { placeholder: 'Town / City', key: 'townCity' },
+                    { placeholder: 'Postcode',    key: 'postcode' },
+                  ].map(({ placeholder, key }) => (
+                    <input
+                      key={key}
+                      type="text"
+                      placeholder={placeholder}
+                      className={inputCls}
+                      style={inputStyle}
+                      value={shippingInfo[key as keyof typeof shippingInfo]}
+                      onChange={(e) => setShippingInfo({ ...shippingInfo, [key]: e.target.value })}
+                    />
+                  ))}
+                  <button className="lg-btn-accent px-8 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest">
                     Update Shipping
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </div>
-          </div>
 
-          {/* COLONNE DROITE : RÉSUMÉ (VIOLET) */}
-          <div className="lg:col-span-1">
-            <div className="bg-[#3D002E] rounded-3xl p-8 text-white sticky top-28 shadow-xl border border-white/5">
-              <h2 className="text-lg font-bold mb-8 opacity-90">{cartItems.length} Items In Cart</h2>
-              
-              <div className="space-y-6">
-                <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                  <span className="text-xs font-medium opacity-60 uppercase tracking-wider">Subtotal</span>
-                  <span className="font-semibold text-base">£{subtotal.toFixed(2)}</span>
-                </div>
-                
-                <div className="space-y-3">
+            {/* ── RIGHT COLUMN: Summary ── */}
+            <div className="lg:col-span-1">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="rounded-3xl p-8 sticky top-28"
+                style={{
+                  background: 'linear-gradient(145deg, #f0fdf4 0%, #f7fee7 100%)',
+                  border: '1.5px solid rgba(132,204,22,0.22)',
+                  boxShadow: '0 8px 40px rgba(132,204,22,0.12)',
+                }}
+              >
+                <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl"
+                  style={{ background: 'linear-gradient(90deg, #84cc16, #facc15)' }} />
+                <h2 className="text-base font-black uppercase tracking-tight mb-8" style={{ color: '#1a2e05' }}>
+                  Order Summary
+                </h2>
+
+                <div className="space-y-5 mb-8">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium opacity-60 uppercase tracking-wider">Shipping</span>
-                    <span className="font-semibold text-base">£{shippingCost.toFixed(2)}</span>
+                    <span className="text-xs font-black uppercase tracking-wider text-[#6b7280]">Subtotal</span>
+                    <span className="font-black text-base" style={{ color: '#1a2e05' }}>£{subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                    <p className="text-orange-300 font-bold text-[9px] uppercase tracking-widest mb-1">Express Delivery</p>
-                    <p className="text-[10px] opacity-40 leading-relaxed">Fast tracked delivery to your address.</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#6b7280]">Shipping</span>
+                    <span className="font-black text-base" style={{ color: shipping === 0 ? '#65a30d' : '#ca8a04' }}>
+                      {shipping === 0 ? 'Free' : `£${shipping.toFixed(2)}`}
+                    </span>
+                  </div>
+                  {shipping === 0 && (
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                      style={{ background: 'rgba(132,204,22,0.10)', border: '1px solid rgba(132,204,22,0.18)' }}>
+                      <Package size={13} className="text-[#65a30d]" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#65a30d]">Free shipping unlocked!</span>
+                    </div>
+                  )}
+                  <div className="pt-4 border-t" style={{ borderColor: 'rgba(132,204,22,0.15)' }}>
+                    <div className="flex justify-between items-end">
+                      <span className="font-black text-sm uppercase tracking-wider text-[#6b7280]">Total</span>
+                      <span className="text-3xl font-black tracking-tight" style={{ color: '#1a2e05' }}>
+                        £{total.toFixed(2)}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-4">
-                  <div className="flex justify-between items-end">
-                    <span className="font-bold text-sm uppercase opacity-60">Total</span>
-                    <span className="text-3xl font-bold tracking-tight">£{total.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                <div className="pt-6 space-y-3">
-                  <button 
-                    onClick={handleProceedToCheckout}
-                    className="w-full bg-[#EF6C00] text-white py-4 rounded-xl font-bold text-xs uppercase tracking-[0.15em] shadow-lg hover:bg-orange-600 transition-all flex items-center justify-center gap-2 group active:scale-[0.98]"
+                <div className="space-y-3">
+                  <button
+                    onClick={() => cartItems.length ? router.push('/checkout') : alert('Your cart is empty.')}
+                    className="w-full lg-btn-accent py-4 rounded-xl font-black uppercase text-[11px] tracking-[0.15em] flex items-center justify-center gap-2 group"
                   >
-                    Proceed To Checkout 
+                    Checkout
                     <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </button>
-                  
-                  <button 
-                    onClick={() => saveCart([...cartItems])}
-                    className="w-full border border-white/20 text-white py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-white/5 transition-all"
-                  >
-                    Update Cart
-                  </button>
+                  <Link href="/products"
+                    className="w-full lg-btn py-3 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center">
+                    Continue Shopping
+                  </Link>
                 </div>
-              </div>
-            </div>
-          </div>
 
-        </div>
+                <p className="text-center text-[10px] text-[#9ca3af] font-medium mt-6">
+                  Secure checkout · SSL encrypted
+                </p>
+              </motion.div>
+            </div>
+
+          </div>
+        )}
       </main>
 
       <Footer />

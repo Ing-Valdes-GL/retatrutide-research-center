@@ -3,120 +3,198 @@
 import { motion } from 'framer-motion'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { ArrowRight, ShoppingBag, Percent, Truck, FlaskConical, Globe, ShieldCheck } from 'lucide-react'
+import { ArrowRight, FlaskConical, Globe, ShieldCheck, Microscope, Award, Users } from 'lucide-react'
 import Link from 'next/link'
+
+const springIn = (delay = 0) => ({
+  initial: { opacity: 0, y: 32, filter: 'blur(8px)' },
+  whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' },
+  viewport: { once: true as const },
+  transition: { type: 'spring' as const, bounce: 0.25, duration: 1.2, delay },
+})
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-screen bg-white text-[#14532d]">
       <Header />
 
-      {/* HERO */}
-      <section className="pt-32 pb-20 border-b border-white/5 text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04]"
-          style={{ backgroundImage: 'radial-gradient(circle, #0ea5e9 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[200px] bg-[#0ea5e9]/8 blur-[100px] rounded-full pointer-events-none" />
+      {/* ── HERO ── */}
+      <section className="pt-32 pb-24 text-center relative overflow-hidden"
+        style={{ background: 'linear-gradient(160deg, #f7fee7 0%, #ffffff 50%, #fefce8 100%)' }}>
+        <motion.div
+          animate={{ scale: [1, 1.15, 1], x: [0, 20, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-0 right-0 w-[500px] h-[400px] rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(132,204,22,0.12) 0%, transparent 70%)' }}
+        />
+        <motion.div
+          animate={{ scale: [1, 1.12, 1] }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut', delay: 5 }}
+          className="absolute bottom-0 left-0 w-[400px] h-[300px] rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(250,204,21,0.10) 0%, transparent 70%)' }}
+        />
+
         <div className="container mx-auto px-6 relative z-10">
-          <p className="text-[11px] uppercase tracking-[0.3em] font-bold text-[#0ea5e9] mb-4">Discovery</p>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-white">About Our Labs</h1>
-          <p className="text-white/40 text-sm max-w-md mx-auto leading-relaxed">
-            Pioneering peptide science through precision research, rigorous testing, and global distribution.
-          </p>
-          <div className="w-24 h-[2px] bg-[#0ea5e9] mx-auto mt-8" />
+          <motion.p {...springIn(0)} className="text-[11px] uppercase tracking-[0.35em] font-black mb-6" style={{ color: '#65a30d' }}>
+            Our Story
+          </motion.p>
+          <motion.h1 {...springIn(0.08)}
+            className="text-5xl md:text-7xl font-black tracking-tight mb-6 leading-[0.9]"
+            style={{ color: '#1a2e05', letterSpacing: '-0.04em' }}>
+            Science.<br />
+            <span style={{ color: '#84cc16' }}>Precision.</span><br />
+            <span style={{ color: '#ca8a04' }}>Trust.</span>
+          </motion.h1>
+          <motion.p {...springIn(0.16)} className="text-[#4b7c59] text-lg max-w-lg mx-auto leading-relaxed">
+            Pioneering peptide science through precision research, rigorous testing, and global distribution since 2019.
+          </motion.p>
+          <motion.div {...springIn(0.24)} className="mt-10">
+            <div className="w-16 h-1 rounded-full mx-auto" style={{ background: 'linear-gradient(90deg, #84cc16, #facc15)' }} />
+          </motion.div>
         </div>
       </section>
 
-      {/* OWNER MESSAGE + SERVICES */}
-      <section className="py-24 bg-[#050505]">
+      {/* ── QUOTE ── */}
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto lg-card rounded-3xl p-10 md:p-16 text-center mb-24">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold mb-6 block">
-              Message from the store owner
+          <motion.div
+            {...springIn(0)}
+            className="max-w-3xl mx-auto rounded-3xl p-12 md:p-16 text-center relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, #f0fdf4 0%, #f7fee7 100%)',
+              border: '1.5px solid rgba(132,204,22,0.18)',
+              boxShadow: '0 8px 48px rgba(132,204,22,0.10)',
+            }}
+          >
+            <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl"
+              style={{ background: 'linear-gradient(90deg, #84cc16, #facc15)' }} />
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#9ca3af] font-black mb-6 block">
+              Message from the founder
             </span>
-            <h2 className="text-xl md:text-2xl font-medium leading-relaxed italic text-white/80 mb-8">
+            <h2 className="text-xl md:text-2xl font-medium leading-relaxed italic mb-8" style={{ color: '#14532d' }}>
               "Our mission is to provide the highest purity compounds with absolute transparency. Innovation in healthcare starts with precision in the lab."
             </h2>
-            <p className="text-[#0ea5e9] font-bold text-xs uppercase tracking-widest">
-              Allen Bryant <span className="text-white/30 font-normal ml-2">— Retatrutide Research Center</span>
+            <p className="font-black text-xs uppercase tracking-widest" style={{ color: '#65a30d' }}>
+              Allen Bryant <span className="text-[#9ca3af] font-normal ml-2 normal-case tracking-normal">— Retatrutide Research Center</span>
             </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── PILLARS ── */}
+      <section className="py-24" style={{ background: '#f7fee7', borderTop: '1px solid rgba(132,204,22,0.10)', borderBottom: '1px solid rgba(132,204,22,0.10)' }}>
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <motion.p {...springIn(0)} className="text-[11px] uppercase tracking-[0.35em] font-black mb-3" style={{ color: '#65a30d' }}>What we stand for</motion.p>
+            <motion.h2 {...springIn(0.06)} className="text-4xl font-black tracking-tight" style={{ color: '#1a2e05', letterSpacing: '-0.03em' }}>Built on three pillars</motion.h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { title: 'Specialized Labs', icon: <FlaskConical size={28} />, desc: 'State-of-the-art synthesis and analytical facilities for high-purity compound production.' },
-              { title: 'Research Focused', icon: <Percent size={28} />, desc: 'Every batch is subjected to rigorous HPLC analysis ensuring ≥99% purity standards.' },
-              { title: 'Global Logistics', icon: <Globe size={28} />, desc: 'Discreet, temperature-controlled shipping to research institutions worldwide.' },
+              { icon: <FlaskConical size={28} />, title: 'Specialized Labs', desc: 'State-of-the-art synthesis and analytical facilities for high-purity compound production.', accent: '#84cc16', bg: '#f0fdf4' },
+              { icon: <Microscope size={28} />, title: 'Research Focused', desc: 'Every batch is subjected to rigorous HPLC analysis ensuring ≥99% purity standards across all products.', accent: '#ca8a04', bg: '#fefce8' },
+              { icon: <Globe size={28} />, title: 'Global Logistics', desc: 'Discreet, temperature-controlled shipping to research institutions worldwide in 50+ countries.', accent: '#84cc16', bg: '#f0fdf4' },
             ].map((item, i) => (
-              <div key={i} className="group lg-card rounded-2xl p-10 text-center hover:border-[#0ea5e9]/20 transition-all duration-300">
-                <div className="w-16 h-16 lg-badge text-[#0ea5e9] rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+              <motion.div
+                key={i}
+                {...springIn(i * 0.10)}
+                whileHover={{ y: -6 }}
+                className="group lg-card rounded-2xl p-10 text-center"
+                style={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.12, rotate: 4 }}
+                  transition={{ type: 'spring' as const, stiffness: 300 }}
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
+                  style={{ background: item.bg, border: `1.5px solid ${item.accent}35`, color: item.accent, boxShadow: `0 4px 20px ${item.accent}20` }}
+                >
                   {item.icon}
-                </div>
-                <h3 className="text-base font-bold mb-3 uppercase tracking-tight text-white">{item.title}</h3>
-                <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
-              </div>
+                </motion.div>
+                <h3 className="text-base font-black mb-3 uppercase tracking-tight" style={{ color: '#1a2e05' }}>{item.title}</h3>
+                <p className="text-[#4b7c59] text-sm leading-relaxed">{item.desc}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* STATS */}
-      <section className="bg-[#050A30] py-24 relative overflow-hidden border-y border-white/5">
-        <div className="absolute inset-0 opacity-[0.06]"
-          style={{ backgroundImage: 'linear-gradient(#0ea5e9 1px, transparent 1px), linear-gradient(90deg, #0ea5e9 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-        <div className="container mx-auto px-6 text-center relative z-10">
-          <h2 className="text-white text-xl md:text-3xl font-medium max-w-3xl mx-auto mb-20 leading-snug">
-            Advanced Logistics Are Not Just About Speed, But About The Integrity Of Every Compound We Deliver.
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto border-t border-white/10 pt-16">
+      {/* ── STATS ── */}
+      <section className="py-28 bg-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle, #84cc16 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.h2 {...springIn(0)}
+            className="text-2xl md:text-4xl font-medium max-w-3xl mx-auto text-center mb-20 leading-snug"
+            style={{ color: '#1a2e05' }}>
+            Advanced logistics are not just about speed, but the <em style={{ color: '#84cc16', fontStyle: 'normal', fontWeight: 900 }}>integrity</em> of every compound we deliver.
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto pt-16"
+            style={{ borderTop: '1px solid rgba(132,204,22,0.15)' }}>
             {[
-              { val: '3M+', label: 'Compounds Delivered' },
-              { val: '15', label: 'Verified Hubs' },
-              { val: '4.7k+', label: 'Professional Partners' },
-            ].map((s) => (
-              <div key={s.label}>
-                <p className="text-[#0ea5e9] text-4xl font-bold mb-2">{s.val}</p>
-                <p className="text-white/40 text-[10px] uppercase font-bold tracking-[0.2em]">{s.label}</p>
-              </div>
+              { val: '3M+',   label: 'Compounds Delivered',   color: '#65a30d' },
+              { val: '15',    label: 'Verified Global Hubs',  color: '#ca8a04' },
+              { val: '4.7k+', label: 'Professional Partners', color: '#65a30d' },
+            ].map((s, i) => (
+              <motion.div key={s.label} {...springIn(i * 0.08)} className="text-center">
+                <p className="text-5xl md:text-6xl font-black tracking-tight mb-3" style={{ color: s.color }}>{s.val}</p>
+                <p className="text-[#6b7280] text-[10px] uppercase font-black tracking-[0.25em]">{s.label}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* MARQUEE */}
-      <div className="bg-[#0a0a0f] py-8 overflow-hidden border-b border-white/5">
-        <div className="flex whitespace-nowrap animate-marquee-fast">
+      {/* ── RUNNING TEXT MARQUEE ── */}
+      <div className="py-6 overflow-hidden" style={{ background: 'linear-gradient(90deg, #f0fdf4, #f7fee7)' }}>
+        <div className="flex whitespace-nowrap animate-marquee-slow">
           {[1, 2, 3, 4].map((i) => (
-            <span key={i} className="text-white/20 text-2xl md:text-3xl font-bold uppercase tracking-tighter mx-12">
+            <span key={i} className="text-3xl md:text-4xl font-black uppercase tracking-tighter mx-12"
+              style={{ color: 'rgba(132,204,22,0.25)' }}>
               Research Grade Compounds — 100% Lab Verified — Global Delivery ★
             </span>
           ))}
         </div>
       </div>
 
-      {/* CTA */}
-      <section className="py-28 bg-[#050505]">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center gap-20">
-          <div className="md:w-1/2">
-            <p className="text-[#0ea5e9] text-xs font-black uppercase tracking-widest mb-4">Precision Research</p>
-            <h3 className="text-3xl md:text-5xl font-bold mb-8 leading-tight tracking-tight text-white">
-              Precision Research,<br />Exceptional Results.
-            </h3>
-            <p className="text-white/40 mb-10 text-base leading-relaxed">
+      {/* ── CTA ── */}
+      <section className="py-32" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #f7fee7 50%, #fefce8 100%)' }}>
+        <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-20">
+          <div className="lg:w-1/2">
+            <motion.p {...springIn(0)} className="text-[11px] font-black uppercase tracking-[0.3em] mb-4" style={{ color: '#65a30d' }}>
+              Precision Research
+            </motion.p>
+            <motion.h3 {...springIn(0.06)}
+              className="text-4xl md:text-6xl font-black mb-8 leading-tight tracking-tight"
+              style={{ color: '#1a2e05', letterSpacing: '-0.03em' }}>
+              Precision.<br />
+              <span style={{ color: '#84cc16' }}>Exceptional</span><br />
+              Results.
+            </motion.h3>
+            <motion.p {...springIn(0.12)} className="text-[#4b7c59] mb-10 text-base leading-relaxed max-w-md">
               Our facilities meet the rigorous standards of modern science. Every batch is tested and verified for the highest consistency.
-            </p>
-            <Link href="/products"
-              className="inline-flex items-center gap-4 lg-btn-accent px-10 py-4 rounded-xl font-bold uppercase text-[11px] tracking-widest text-white">
-              Explore Products <ArrowRight size={18} />
-            </Link>
+            </motion.p>
+            <motion.div {...springIn(0.18)}>
+              <Link href="/products"
+                className="inline-flex items-center gap-3 lg-btn-accent px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest">
+                Explore Products <ArrowRight size={16} />
+              </Link>
+            </motion.div>
           </div>
-          <div className="md:w-1/2">
-            <div className="aspect-[4/5] lg-card rounded-3xl overflow-hidden">
+
+          <div className="lg:w-1/2">
+            <motion.div
+              whileHover={{ boxShadow: '0 20px 60px rgba(132,204,22,0.20)' }}
+              transition={{ duration: 0.3 }}
+              className="aspect-[4/5] rounded-3xl overflow-hidden"
+              style={{ border: '1.5px solid rgba(132,204,22,0.18)', boxShadow: '0 8px 40px rgba(132,204,22,0.10)' }}
+            >
               <video autoPlay muted loop playsInline preload="metadata"
                 poster="/assets/cells-poster.webp"
-                className="w-full h-full object-cover opacity-80">
+                className="w-full h-full object-cover">
                 <source src="/assets/cells.mp4" type="video/mp4" />
               </video>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -124,8 +202,8 @@ export default function AboutPage() {
       <Footer />
 
       <style jsx global>{`
-        @keyframes marquee-fast { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .animate-marquee-fast { animation: marquee-fast 14s linear infinite; }
+        @keyframes marquee-slow { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .animate-marquee-slow { animation: marquee-slow 18s linear infinite; }
       `}</style>
     </div>
   )
