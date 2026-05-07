@@ -5,7 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { ArrowLeft, Loader2, Lock, Mail, CheckCircle2, AlertCircle, Shield } from 'lucide-react'
+import { ArrowLeft, Loader2, Lock, Mail, CheckCircle2, AlertCircle, Shield, FlaskConical } from 'lucide-react'
+
+const ease = [0.16, 1, 0.3, 1] as const
 
 export default function LoginPage() {
   const router = useRouter()
@@ -35,29 +37,35 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-[#14532d] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#09090b', color: '#fafafa' }}>
 
-      {/* Decorative blobs */}
+      {/* Amber stripe */}
+      <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, transparent, #d97706 30%, #f59e0b 50%, #d97706 70%, transparent)' }} />
+
+      {/* Blobs */}
       <motion.div
         animate={{ scale: [1, 1.18, 1], x: [0, 30, 0] }}
         transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(132,204,22,0.12) 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, rgba(217,119,6,0.08) 0%, transparent 70%)' }}
       />
       <motion.div
         animate={{ scale: [1, 1.14, 1] }}
         transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut', delay: 6 }}
         className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(250,204,21,0.10) 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%)' }}
       />
       <div className="absolute inset-0 opacity-[0.025] pointer-events-none"
-        style={{ backgroundImage: 'radial-gradient(circle, #84cc16 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        style={{ backgroundImage: 'radial-gradient(circle, #d97706 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
       {/* Back link */}
       <div className="relative z-10 p-8 md:p-12">
         <Link href="/"
-          className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#9ca3af] hover:text-[#65a30d] transition-colors">
-          <ArrowLeft size={14} /> Back to Home
+          className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors"
+          style={{ color: '#52525b' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#fbbf24')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#52525b')}>
+          <ArrowLeft size={13} /> Back to Home
         </Link>
       </div>
 
@@ -66,49 +74,40 @@ export default function LoginPage() {
         <motion.div
           initial={{ opacity: 0, y: 32, filter: 'blur(8px)' }}
           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          transition={{ type: 'spring' as const, bounce: 0.25, duration: 1.0 }}
+          transition={{ duration: 0.8, ease }}
           className="w-full max-w-sm"
         >
-          {/* Icon */}
+          {/* Logo */}
           <div className="flex justify-center mb-8">
             <motion.div
               whileHover={{ scale: 1.08, rotate: 4 }}
               transition={{ type: 'spring' as const, stiffness: 300 }}
               className="w-16 h-16 rounded-2xl flex items-center justify-center"
               style={{
-                background: 'linear-gradient(135deg, #f0fdf4 0%, #f7fee7 100%)',
-                border: '1.5px solid rgba(132,204,22,0.25)',
-                boxShadow: '0 8px 32px rgba(132,204,22,0.15)',
+                background: 'linear-gradient(135deg, #d97706, #b45309)',
+                boxShadow: '0 8px 32px rgba(217,119,6,0.35)',
               }}
             >
-              <Shield size={28} style={{ color: '#65a30d' }} />
+              <FlaskConical size={28} className="text-white" />
             </motion.div>
           </div>
 
           {/* Heading */}
           <div className="text-center mb-10">
-            <p className="text-[10px] uppercase tracking-[0.35em] font-black mb-3" style={{ color: '#65a30d' }}>
+            <p className="text-[10px] uppercase tracking-[0.4em] font-black mb-3" style={{ color: '#d97706' }}>
               Secure Access
             </p>
-            <h1 className="text-4xl font-black tracking-tight leading-none mb-3"
-              style={{ color: '#1a2e05', letterSpacing: '-0.03em' }}>
+            <h1 className="text-4xl font-black tracking-tight leading-none mb-3 text-white" style={{ letterSpacing: '-0.03em' }}>
               Sign In
             </h1>
-            <p className="text-[#6b7280] text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed" style={{ color: '#71717a' }}>
               Enter your email to receive a magic link — no password needed.
             </p>
           </div>
 
           {/* Card */}
-          <div className="rounded-3xl p-8"
-            style={{
-              background: 'linear-gradient(145deg, #f0fdf4 0%, #f7fee7 100%)',
-              border: '1.5px solid rgba(132,204,22,0.18)',
-              boxShadow: '0 8px 40px rgba(132,204,22,0.10)',
-            }}
-          >
-            <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl"
-              style={{ background: 'linear-gradient(90deg, #84cc16, #facc15)', position: 'relative', borderRadius: '8px 8px 0 0', marginBottom: '0' }} />
+          <div className="rounded-3xl p-8 ds-surface" style={{ border: '1px solid rgba(255,255,255,0.10)' }}>
+            <div className="h-0.5 w-full mb-8 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #d97706, #f59e0b, transparent)' }} />
 
             <AnimatePresence mode="wait">
               {!sent ? (
@@ -121,20 +120,14 @@ export default function LoginPage() {
                   className="space-y-4"
                 >
                   <div className="relative">
-                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: '#84cc16' }} />
+                    <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: '#d97706' }} />
                     <input
                       type="email"
                       placeholder="your@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-12 pr-4 py-4 rounded-xl text-sm font-medium outline-none text-[#1a2e05] placeholder:text-[#9ca3af] transition-all"
-                      style={{
-                        background: '#ffffff',
-                        border: '1.5px solid rgba(132,204,22,0.25)',
-                      }}
-                      onFocus={(e) => { e.target.style.borderColor = '#84cc16'; e.target.style.boxShadow = '0 0 0 3px rgba(132,204,22,0.10)' }}
-                      onBlur={(e) => { e.target.style.borderColor = 'rgba(132,204,22,0.25)'; e.target.style.boxShadow = 'none' }}
+                      className="w-full pl-12 pr-4 py-4 rounded-xl text-sm font-medium ds-input"
                     />
                   </div>
 
@@ -144,19 +137,16 @@ export default function LoginPage() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className={`flex items-center gap-3 p-4 rounded-xl text-xs font-bold overflow-hidden ${
-                          message.type === 'success'
-                            ? 'text-[#65a30d]'
-                            : 'text-red-600'
-                        }`}
+                        className={`flex items-center gap-3 p-4 rounded-xl text-xs font-bold overflow-hidden`}
                         style={{
-                          background: message.type === 'success' ? 'rgba(132,204,22,0.08)' : 'rgba(239,68,68,0.06)',
-                          border: `1px solid ${message.type === 'success' ? 'rgba(132,204,22,0.20)' : 'rgba(239,68,68,0.15)'}`,
+                          background: message.type === 'success' ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
+                          border: `1px solid ${message.type === 'success' ? 'rgba(16,185,129,0.20)' : 'rgba(239,68,68,0.20)'}`,
+                          color: message.type === 'success' ? '#34d399' : '#f87171',
                         }}
                       >
                         {message.type === 'success'
-                          ? <CheckCircle2 size={15} />
-                          : <AlertCircle size={15} />}
+                          ? <CheckCircle2 size={14} />
+                          : <AlertCircle size={14} />}
                         {message.text}
                       </motion.div>
                     )}
@@ -165,16 +155,11 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-4 rounded-xl font-black uppercase text-[11px] tracking-widest flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                    style={{
-                      background: 'linear-gradient(135deg, #84cc16 0%, #65a30d 100%)',
-                      color: '#ffffff',
-                      boxShadow: '0 4px 20px rgba(132,204,22,0.30)',
-                    }}
+                    className="w-full py-4 rounded-xl font-black uppercase text-[11px] tracking-widest flex items-center justify-center gap-3 ds-btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {loading
                       ? <><Loader2 size={16} className="animate-spin" /> Sending…</>
-                      : <><Lock size={15} /> Send Magic Link</>
+                      : <><Lock size={14} /> Send Magic Link</>
                     }
                   </button>
                 </motion.form>
@@ -191,18 +176,17 @@ export default function LoginPage() {
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring' as const, bounce: 0.5, duration: 0.7, delay: 0.1 }}
                     className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-                    style={{ background: 'rgba(132,204,22,0.12)', border: '2px solid rgba(132,204,22,0.25)' }}
+                    style={{ background: 'rgba(16,185,129,0.12)', border: '2px solid rgba(16,185,129,0.25)' }}
                   >
-                    <CheckCircle2 size={32} style={{ color: '#65a30d' }} />
+                    <CheckCircle2 size={30} style={{ color: '#34d399' }} />
                   </motion.div>
-                  <h3 className="font-black text-lg mb-2" style={{ color: '#1a2e05' }}>Check your inbox</h3>
-                  <p className="text-[#6b7280] text-sm leading-relaxed mb-6">
-                    We sent a magic link to <span className="font-bold text-[#1a2e05]">{email}</span>. Click it to sign in instantly.
+                  <h3 className="font-black text-lg mb-2 text-white">Check your inbox</h3>
+                  <p className="text-sm leading-relaxed mb-6" style={{ color: '#71717a' }}>
+                    We sent a magic link to <span className="font-bold text-white">{email}</span>. Click it to sign in instantly.
                   </p>
                   <button
                     onClick={() => { setSent(false); setMessage({ type: '', text: '' }) }}
-                    className="text-[10px] font-black uppercase tracking-widest transition-colors"
-                    style={{ color: '#65a30d' }}
+                    className="text-[10px] font-black uppercase tracking-widest transition-colors ds-text-gradient"
                   >
                     Use a different email →
                   </button>
@@ -213,21 +197,20 @@ export default function LoginPage() {
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px" style={{ background: 'rgba(132,204,22,0.15)' }} />
-            <span className="text-[10px] text-[#9ca3af] uppercase tracking-widest font-bold">or</span>
-            <div className="flex-1 h-px" style={{ background: 'rgba(132,204,22,0.15)' }} />
+            <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
+            <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#3f3f46' }}>or</span>
+            <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
           </div>
 
           <Link href="/products"
-            className="block w-full py-4 rounded-xl font-black uppercase text-[10px] tracking-widest text-center transition-all lg-btn"
-          >
+            className="block w-full py-4 rounded-xl font-black uppercase text-[10px] tracking-widest text-center ds-btn-secondary">
             Browse Without Account
           </Link>
 
           {/* Trust note */}
           <div className="flex items-center justify-center gap-2 mt-8">
-            <Shield size={12} style={{ color: '#9ca3af' }} />
-            <p className="text-[10px] text-[#9ca3af] font-medium">
+            <Shield size={11} style={{ color: '#3f3f46' }} />
+            <p className="text-[10px] font-medium" style={{ color: '#3f3f46' }}>
               Retatrutide Research Center · Secure Sign-In
             </p>
           </div>

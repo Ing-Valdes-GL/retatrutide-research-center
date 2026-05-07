@@ -1,8 +1,5 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
 import { Metadata } from 'next'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
@@ -11,22 +8,13 @@ export const metadata: Metadata = {
   },
   description: "Retatrutide Research Center provides cutting-edge pharmaceutical research and development with secure logistics across the UK.",
   metadataBase: new URL('https://alluvihealth.store'),
-  alternates: {
-    canonical: '/',
-  },
+  alternates: { canonical: '/' },
   openGraph: {
     title: "Retatrutide Research Center | Advanced Research",
     description: "Cutting-edge pharmaceutical research and development services.",
     url: 'https://alluvihealth.store',
     siteName: 'Retatrutide Research Center',
-    images: [
-      {
-        url: '/favicon.ico',
-        width: 1200,
-        height: 630,
-        alt: 'Retatrutide Research Center Logo',
-      },
-    ],
+    images: [{ url: '/favicon.ico', width: 1200, height: 630, alt: 'RRC Logo' }],
     locale: 'en_GB',
     type: 'website',
   },
@@ -45,9 +33,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-white text-[#14532d]`}>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   )
 }
