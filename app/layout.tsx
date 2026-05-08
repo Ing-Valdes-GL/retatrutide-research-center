@@ -7,12 +7,12 @@ export const metadata: Metadata = {
     template: "%s | Retatrutide Research Center"
   },
   description: "Retatrutide Research Center provides cutting-edge pharmaceutical research and development with secure logistics across the UK.",
-  metadataBase: new URL('https://alluvihealth.store'),
+  metadataBase: new URL('https://retatrutideresearchcenter.vercel.app'),
   alternates: { canonical: '/' },
   openGraph: {
     title: "Retatrutide Research Center | Advanced Research",
     description: "Cutting-edge pharmaceutical research and development services.",
-    url: 'https://alluvihealth.store',
+    url: 'https://retatrutideresearchcenter.vercel.app',
     siteName: 'Retatrutide Research Center',
     images: [{ url: '/favicon.ico', width: 1200, height: 630, alt: 'RRC Logo' }],
     locale: 'en_GB',
