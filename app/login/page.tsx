@@ -23,7 +23,7 @@ export default function LoginPage() {
       setMessage({ type: '', text: '' })
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: `${window.location.origin}/orders` }
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/orders` }
       })
       if (error) throw error
       setSent(true)

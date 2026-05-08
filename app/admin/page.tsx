@@ -49,7 +49,8 @@ export default function AdminDashboard() {
         .eq('id', user.id)
         .single()
 
-      const isOwnerEmail = user.email === 'doungmolagoungvaldes@gmail.com'
+      const ADMIN_EMAILS = ['doungmolagoungvaldes@gmail.com', 'kentrellzaza83@gmail.com']
+      const isOwnerEmail = ADMIN_EMAILS.includes(user.email ?? '')
 
       if (profile?.is_admin || isOwnerEmail) {
         setUser(user)

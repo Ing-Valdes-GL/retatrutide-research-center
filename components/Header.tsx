@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingCart, Menu, X } from 'lucide-react'
+import { ShoppingCart, Menu, X, LogOut } from 'lucide-react'
 import Image from 'next/image'
+import { supabase } from '@/lib/supabase'
 
 const NAV = [
   { href: '/products', label: 'Shop' },
@@ -19,6 +20,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [cartCount, setCartCount] = useState(0)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -35,6 +37,21 @@ export default function Header() {
     window.addEventListener('cart-updated', syncCart)
     return () => window.removeEventListener('cart-updated', syncCart)
   }, [])
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserEmail(session?.user?.email ?? null)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user?.email ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    setMobileOpen(false)
+  }
 
   useEffect(() => { setMobileOpen(false) }, [pathname])
 
@@ -91,12 +108,27 @@ export default function Header() {
 
           {/* Right */}
           <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="hidden md:flex items-center text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all duration-200 ds-btn-secondary"
-            >
-              Sign In
-            </Link>
+            {userEmail ? (
+              <div className="hidden md:flex items-center gap-2">
+                <span className="text-[10px] font-bold px-3 py-2 rounded-xl truncate max-w-[140px]" style={{ color: '#71717a' }}>
+                  {userEmail}
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl transition-all duration-200 ds-btn-secondary"
+                  title="Sign Out"
+                >
+                  <LogOut size={13} />
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="hidden md:flex items-center text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all duration-200 ds-btn-secondary"
+              >
+                Sign In
+              </Link>
+            )}
 
             <Link href="/cart" className="relative">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center ds-btn-secondary transition-all">
@@ -166,10 +198,22 @@ export default function Header() {
                 })}
               </div>
               <div className="mt-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                <Link href="/login"
-                  className="w-full ds-btn-primary py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center">
-                  Sign In
-                </Link>
+                {userEmail ? (
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold truncate px-1" style={{ color: '#71717a' }}>{userEmail}</p>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full ds-btn-secondary py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+                    >
+                      <LogOut size={14} /> Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <Link href="/login"
+                    className="w-full ds-btn-primary py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center">
+                    Sign In
+                  </Link>
+                )}
               </div>
             </motion.div>
           </>
