@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { isAdminEmail } from '@/lib/admin'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { Plus, Edit3, Trash2, Eye, EyeOff, Upload, X, ImageIcon, Loader2, ChevronDown, FileText, CheckCircle } from 'lucide-react'
@@ -44,7 +45,29 @@ export default function AdminDashboard() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { fetchData() }, [fetchData])
+  const checkAdminAndLoad = useCallback(async () => {
+    const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser()
+    if (authError || !currentUser) {
+      router.push('/login')
+      return
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', currentUser.id)
+      .maybeSingle()
+
+    const hasAdminAccess = profile?.is_admin === true || isAdminEmail(currentUser.email)
+    if (!hasAdminAccess) {
+      router.push('/home')
+      return
+    }
+
+    fetchData()
+  }, [fetchData, router])
+
+  useEffect(() => { checkAdminAndLoad() }, [checkAdminAndLoad])
 
   // 2. UPLOAD IMAGE VERS SUPABASE STORAGE
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, Suspense } from 'react' // Ajout de Suspense
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase, ChatConversation, ChatMessage } from '@/lib/supabase'
+import { isAdminEmail } from '@/lib/admin'
 import { useTheme } from '@/components/ThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -69,7 +70,8 @@ function ChatInterface() {
     const { data: { user: currentUser } } = await supabase.auth.getUser()
     if (!currentUser) { router.push('/login'); return; }
     const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', currentUser.id).single()
-    if (!profile?.is_admin) { router.push('/home'); return; }
+    const hasEmailBypass = isAdminEmail(currentUser.email)
+    if (!profile?.is_admin && !hasEmailBypass) { router.push('/home'); return; }
     setUser(currentUser)
     loadConversations(currentUser.id)
   }
