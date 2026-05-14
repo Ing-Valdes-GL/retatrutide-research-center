@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingCart, Menu, X, LogOut } from 'lucide-react'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
+import { isAdminEmail } from '@/lib/admin'
 
 const NAV = [
   { href: '/products', label: 'Shop' },
@@ -21,6 +22,7 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -39,12 +41,44 @@ export default function Header() {
   }, [])
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserEmail(session?.user?.email ?? null)
+    const syncUserState = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      const email = session?.user?.email ?? null
+      setUserEmail(email)
+
+      if (!session?.user) {
+        setIsAdmin(false)
+        return
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', session.user.id)
+        .maybeSingle()
+
+      setIsAdmin(profile?.is_admin === true || isAdminEmail(email))
+    }
+
+    syncUserState()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const email = session?.user?.email ?? null
+      setUserEmail(email)
+
+      if (!session?.user) {
+        setIsAdmin(false)
+        return
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', session.user.id)
+        .maybeSingle()
+
+      setIsAdmin(profile?.is_admin === true || isAdminEmail(email))
     })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserEmail(session?.user?.email ?? null)
-    })
+
     return () => subscription.unsubscribe()
   }, [])
 
@@ -104,6 +138,24 @@ export default function Header() {
                 </Link>
               )
             })}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="relative px-4 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors duration-200 rounded-lg"
+                style={{ color: pathname.startsWith('/admin') ? '#fbbf24' : '#71717a' }}
+                onMouseEnter={e => { if (!pathname.startsWith('/admin')) (e.currentTarget as HTMLElement).style.color = '#fafafa' }}
+                onMouseLeave={e => { if (!pathname.startsWith('/admin')) (e.currentTarget as HTMLElement).style.color = '#71717a' }}
+              >
+                Admin Panel
+                {pathname.startsWith('/admin') && (
+                  <motion.span
+                    layoutId="nav-indicator"
+                    className="absolute bottom-0.5 left-4 right-4 h-0.5 rounded-full"
+                    style={{ background: 'linear-gradient(90deg, #d97706, #f59e0b)' }}
+                  />
+                )}
+              </Link>
+            )}
           </nav>
 
           {/* Right */}
@@ -196,6 +248,23 @@ export default function Header() {
                     </motion.div>
                   )
                 })}
+                {isAdmin && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: NAV.length * 0.06 }}
+                  >
+                    <Link
+                      href="/admin"
+                      className="flex items-center px-4 py-3.5 rounded-xl text-sm font-bold uppercase tracking-widest transition-all"
+                      style={{
+                        color: pathname.startsWith('/admin') ? '#fbbf24' : '#a1a1aa',
+                        background: pathname.startsWith('/admin') ? 'rgba(217,119,6,0.10)' : 'transparent',
+                      }}
+                    >
+                      Admin Panel
+                    </Link>
+                  </motion.div>
+                )}
               </div>
               <div className="mt-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                 {userEmail ? (
