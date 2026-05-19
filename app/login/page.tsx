@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { ArrowLeft, Loader2, Lock, Mail, CheckCircle2, AlertCircle, Shield, FlaskConical } from 'lucide-react'
@@ -11,10 +11,25 @@ const ease = [0.16, 1, 0.3, 1] as const
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })
+
+  useEffect(() => {
+    // Surface errors from the auth callback (query param) or Supabase hash redirects
+    const urlError = searchParams.get('error')
+    const hash = window.location.hash
+    const hashParams = new URLSearchParams(hash.replace('#', ''))
+    const hashErrorCode = hashParams.get('error_code')
+
+    if (hashErrorCode === 'otp_expired' || hashErrorCode === 'access_denied') {
+      setMessage({ type: 'error', text: 'Your magic link has expired or already been used. Please request a new one.' })
+    } else if (urlError === 'auth_failed') {
+      setMessage({ type: 'error', text: 'Sign-in failed. Your link may have expired — please request a new one.' })
+    }
+  }, [searchParams])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()

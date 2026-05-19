@@ -32,5 +32,7 @@ export async function GET(request: Request) {
     }
   }
 
+  // Supabase puts error details in the URL hash — the browser preserves the hash
+  // when following this redirect, so the login page can read it via window.location.hash
   return NextResponse.redirect(`${origin}/login?error=auth_failed`)
 }
