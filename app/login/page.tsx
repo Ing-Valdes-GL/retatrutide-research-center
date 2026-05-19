@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -9,27 +9,32 @@ import { ArrowLeft, Loader2, Lock, Mail, CheckCircle2, AlertCircle, Shield, Flas
 
 const ease = [0.16, 1, 0.3, 1] as const
 
-export default function LoginPage() {
-  const router = useRouter()
+// Isolated component so useSearchParams() doesn't block pre-rendering of the whole page
+function AuthErrorReader({ onError }: { onError: (msg: string) => void }) {
   const searchParams = useSearchParams()
-  const [loading, setLoading] = useState(false)
-  const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
-  const [message, setMessage] = useState({ type: '', text: '' })
 
   useEffect(() => {
-    // Surface errors from the auth callback (query param) or Supabase hash redirects
     const urlError = searchParams.get('error')
     const hash = window.location.hash
     const hashParams = new URLSearchParams(hash.replace('#', ''))
     const hashErrorCode = hashParams.get('error_code')
 
     if (hashErrorCode === 'otp_expired' || hashErrorCode === 'access_denied') {
-      setMessage({ type: 'error', text: 'Your magic link has expired or already been used. Please request a new one.' })
+      onError('Your magic link has expired or already been used. Please request a new one.')
     } else if (urlError === 'auth_failed') {
-      setMessage({ type: 'error', text: 'Sign-in failed. Your link may have expired — please request a new one.' })
+      onError('Sign-in failed. Your link may have expired — please request a new one.')
     }
-  }, [searchParams])
+  }, [searchParams, onError])
+
+  return null
+}
+
+export default function LoginPage() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('')
+  const [sent, setSent] = useState(false)
+  const [message, setMessage] = useState({ type: '', text: '' })
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,6 +58,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#09090b', color: '#fafafa' }}>
+      <Suspense fallback={null}>
+        <AuthErrorReader onError={(msg) => setMessage({ type: 'error', text: msg })} />
+      </Suspense>
 
       {/* Amber stripe */}
       <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, transparent, #d97706 30%, #f59e0b 50%, #d97706 70%, transparent)' }} />
