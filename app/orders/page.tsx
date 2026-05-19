@@ -166,7 +166,7 @@ export default function OrdersPage() {
                     <div className="flex items-center justify-between md:justify-end gap-8">
                       <div className="text-right">
                         <p className="text-[10px] uppercase font-black tracking-widest mb-0.5" style={{ color: '#52525b' }}>Total</p>
-                        <p className="text-lg font-black ds-text-gradient ds-mono">£{Number(order.total_amount).toFixed(2)}</p>
+                        <p className="text-lg font-black ds-text-gradient ds-mono">${Number(order.total_amount).toFixed(2)}</p>
                       </div>
                       <div className="flex items-center gap-3">
                         {getStatusBadge(order.status)}
@@ -202,9 +202,9 @@ export default function OrdersPage() {
                                 <tr key={item.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                                   <td className="py-4 font-black text-sm text-white">{item.product_name}</td>
                                   <td className="py-4 text-center font-bold text-sm" style={{ color: '#71717a' }}>× {item.quantity}</td>
-                                  <td className="py-4 text-right font-medium text-sm" style={{ color: '#71717a' }}>£{Number(item.unit_price).toFixed(2)}</td>
+                                  <td className="py-4 text-right font-medium text-sm" style={{ color: '#71717a' }}>${Number(item.unit_price).toFixed(2)}</td>
                                   <td className="py-4 text-right font-black text-sm ds-text-gradient ds-mono">
-                                    £{(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}
+                                    ${(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}
                                   </td>
                                 </tr>
                               ))}

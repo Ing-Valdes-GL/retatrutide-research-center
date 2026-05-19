@@ -88,7 +88,7 @@ export default function ProductsPage() {
         <div className="flex whitespace-nowrap animate-marquee">
           {[1, 2, 3].map((i) => (
             <span key={i} className="text-[10px] font-bold uppercase tracking-[0.2em] mx-10" style={{ color: '#d97706' }}>
-              Free Shipping on orders above £100 ★ <span style={{ color: '#fbbf24' }}>Special Offer</span> ★ HPLC Verified ≥99% Purity ★
+              Free Shipping on orders above $100 ★ <span style={{ color: '#fbbf24' }}>Special Offer</span> ★ HPLC Verified ≥99% Purity ★
             </span>
           ))}
         </div>
@@ -218,9 +218,9 @@ export default function ProductsPage() {
 
                   <div className="mt-auto">
                     <div className="flex items-baseline gap-2 mb-4">
-                      <p className="font-black text-2xl ds-text-gradient ds-mono">£{product.price}</p>
+                      <p className="font-black text-2xl ds-text-gradient ds-mono">${product.price}</p>
                       {product.on_sale && product.sale_price && (
-                        <p className="line-through text-sm" style={{ color: '#52525b' }}>£{product.sale_price}</p>
+                        <p className="line-through text-sm" style={{ color: '#52525b' }}>${product.sale_price}</p>
                       )}
                     </div>
                     <button

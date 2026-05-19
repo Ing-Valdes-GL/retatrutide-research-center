@@ -169,7 +169,7 @@ export default function AdminDashboard() {
             { label: 'Total Users', value: stats.totalUsers, icon: Users },
             { label: 'Live Products', value: stats.totalProducts, icon: Package },
             { label: 'Pending Orders', value: stats.pendingOrders, icon: Clock },
-            { label: 'Total Revenue', value: `${stats.totalRevenue.toLocaleString()} £`, icon: DollarSign },
+            { label: 'Total Revenue', value: `${stats.totalRevenue.toLocaleString()} $`, icon: DollarSign },
           ].map((stat, i) => (
             <div key={i} className={`${theme === 'dark' ? 'bg-gray-900/40 border-white/5' : 'bg-white border-gray-100'} p-8 rounded-[2rem] border backdrop-blur-sm shadow-xl`}>
               <div className="flex items-center justify-between mb-6">

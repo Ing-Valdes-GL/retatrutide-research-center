@@ -145,7 +145,7 @@ export default function ProductDetails() {
 
             {/* Price */}
             <p className="text-4xl font-black mb-8 tracking-tight ds-text-gradient ds-mono">
-              £{product.price}
+              ${product.price}
             </p>
 
             {/* Quantity + Add */}

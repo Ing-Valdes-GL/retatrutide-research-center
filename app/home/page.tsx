@@ -185,7 +185,7 @@ export default function HomePage() {
           <div className="flex whitespace-nowrap animate-marquee">
             {[1, 2, 3].map((i) => (
               <span key={i} className="font-black text-[11px] uppercase tracking-[0.3em] mx-10 text-white">
-                ★ Fast Shipping on orders above £100 ★&nbsp;
+                ★ Fast Shipping on orders above $100 ★&nbsp;
                 <span className="text-[#fef08a]">100% Lab Tested</span>
                 &nbsp;★ Pure Compounds ★ GLP-1 Research Grade ★
               </span>
@@ -273,7 +273,7 @@ export default function HomePage() {
                   {product.category_name || 'Uncategorized'}
                 </p>
                 <h4 className="font-bold text-sm mb-4 h-10" style={{ color: '#1a2e05' }}>{product.name}</h4>
-                <p className="font-black text-lg mb-6" style={{ color: '#ca8a04' }}>£{product.price}</p>
+                <p className="font-black text-lg mb-6" style={{ color: '#ca8a04' }}>${product.price}</p>
                 <button
                   onClick={() => addToCart(product)}
                   className="w-full lg-btn py-3 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"

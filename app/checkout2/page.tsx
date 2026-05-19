@@ -84,7 +84,7 @@ function CheckoutDetails() {
           {[
             { label: 'Order number', value: order.reference_code || order.id.slice(0, 8).toUpperCase() },
             { label: 'Date', value: new Date(order.created_at).toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' }) },
-            { label: 'Total', value: `£${Number(order.total_amount).toFixed(2)}` },
+            { label: 'Total', value: `$${Number(order.total_amount).toFixed(2)}` },
             { label: 'Payment', value: order.payment_method?.replace('_', ' ') || '—' },
           ].map(({ label, value }) => (
             <div key={label}>
@@ -120,7 +120,7 @@ function CheckoutDetails() {
                     <span className="text-sm font-black" style={{ color: '#d97706' }}>× {item.quantity}</span>
                   </td>
                   <td className="px-8 py-5 text-right font-black ds-text-gradient ds-mono">
-                    £{(item.unit_price * item.quantity).toFixed(2)}
+                    ${(item.unit_price * item.quantity).toFixed(2)}
                   </td>
                 </tr>
               ))}
@@ -128,21 +128,21 @@ function CheckoutDetails() {
             <tfoot className="text-sm" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
               <tr>
                 <td className="px-8 pt-6 text-right font-bold" style={{ color: '#71717a' }}>Subtotal:</td>
-                <td className="px-8 pt-6 text-right font-medium text-white">£{Number(order.subtotal).toFixed(2)}</td>
+                <td className="px-8 pt-6 text-right font-medium text-white">${Number(order.subtotal).toFixed(2)}</td>
               </tr>
               <tr>
                 <td className="px-8 py-3 text-right font-bold" style={{ color: '#71717a' }}>Discount:</td>
-                <td className="px-8 py-3 text-right font-medium" style={{ color: '#34d399' }}>-£{Number(order.discount_amount).toFixed(2)}</td>
+                <td className="px-8 py-3 text-right font-medium" style={{ color: '#34d399' }}>-${Number(order.discount_amount).toFixed(2)}</td>
               </tr>
               <tr>
                 <td className="px-8 py-3 text-right font-bold" style={{ color: '#71717a' }}>Shipping:</td>
                 <td className="px-8 py-3 text-right font-medium" style={{ color: '#71717a' }}>
-                  £{Number(order.shipping_fee).toFixed(2)} <span className="italic text-xs">via Express Delivery</span>
+                  ${Number(order.shipping_fee).toFixed(2)} <span className="italic text-xs">via Express Delivery</span>
                 </td>
               </tr>
               <tr style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
                 <td className="px-8 pt-5 pb-6 text-right font-black text-lg text-white">Total:</td>
-                <td className="px-8 pt-5 pb-6 text-right font-black text-2xl ds-text-gradient ds-mono">£{Number(order.total_amount).toFixed(2)}</td>
+                <td className="px-8 pt-5 pb-6 text-right font-black text-2xl ds-text-gradient ds-mono">${Number(order.total_amount).toFixed(2)}</td>
               </tr>
             </tfoot>
           </table>

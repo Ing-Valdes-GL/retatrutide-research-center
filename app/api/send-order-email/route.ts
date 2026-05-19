@@ -45,7 +45,7 @@ export async function POST(req: Request) {
           <p>Your order <strong>#${order.reference_code}</strong> has been successfully verified and confirmed.</p>
           <div style="background: #f9f9f9; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #eee;">
             <p style="margin: 0; font-size: 12px; text-transform: uppercase; opacity: 0.6; font-weight: bold;">Total Amount Paid</p>
-            <p style="margin: 0; font-size: 28px; font-weight: bold; color: #000;">£${displayAmount}</p>
+            <p style="margin: 0; font-size: 28px; font-weight: bold; color: #000;">$${displayAmount}</p>
           </div>
           <p><strong>Shipping Status:</strong> Your package is currently being prepared by our pharmaceutical logistics team for immediate dispatch.</p>
           <br/>

@@ -162,7 +162,7 @@ export default function LandingPage() {
           <div className="flex whitespace-nowrap animate-marquee">
             {[1,2,3,4].map(i => (
               <span key={i} className="text-[10px] font-black uppercase tracking-[0.35em] mx-12 ds-mono" style={{ color: '#d97706' }}>
-                ★ FREE SHIPPING ABOVE £100 ★ HPLC VERIFIED ★ COA INCLUDED ★ LAB USE ONLY ★ GLOBAL DELIVERY ★&nbsp;
+                ★ FREE SHIPPING ABOVE $100 ★ HPLC VERIFIED ★ COA INCLUDED ★ LAB USE ONLY ★ GLOBAL DELIVERY ★&nbsp;
               </span>
             ))}
           </div>
@@ -270,7 +270,7 @@ export default function LandingPage() {
                     {p.name}
                   </h4>
                 </Link>
-                <p className="text-2xl font-black tracking-tight mb-5 ds-mono" style={{ color: '#f59e0b' }}>£{p.price}</p>
+                <p className="text-2xl font-black tracking-tight mb-5 ds-mono" style={{ color: '#f59e0b' }}>${p.price}</p>
                 <div className="mt-auto flex gap-2">
                   <button onClick={() => addToCart(p)}
                     className="flex-1 ds-btn-primary py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">

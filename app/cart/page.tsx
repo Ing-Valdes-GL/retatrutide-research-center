@@ -125,7 +125,7 @@ export default function CartPage() {
                         {item.category_name || 'Research Grade'}
                       </p>
                       <h3 className="font-black text-white text-sm leading-tight truncate">{item.name}</h3>
-                      <p className="font-black text-base mt-1 ds-text-gradient ds-mono">£{item.price.toFixed(2)}</p>
+                      <p className="font-black text-base mt-1 ds-text-gradient ds-mono">${item.price.toFixed(2)}</p>
                     </div>
 
                     {/* Quantity */}
@@ -149,7 +149,7 @@ export default function CartPage() {
 
                     {/* Subtotal */}
                     <p className="font-black text-base shrink-0 min-w-[4rem] text-right text-white">
-                      £{(item.price * item.quantity).toFixed(2)}
+                      ${(item.price * item.quantity).toFixed(2)}
                     </p>
 
                     {/* Remove */}
@@ -222,12 +222,12 @@ export default function CartPage() {
                 <div className="space-y-5 mb-8">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-black uppercase tracking-wider" style={{ color: '#52525b' }}>Subtotal</span>
-                    <span className="font-black text-base text-white">£{subtotal.toFixed(2)}</span>
+                    <span className="font-black text-base text-white">${subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-black uppercase tracking-wider" style={{ color: '#52525b' }}>Shipping</span>
                     <span className="font-black text-base" style={{ color: shipping === 0 ? '#34d399' : '#fbbf24' }}>
-                      {shipping === 0 ? 'Free' : `£${shipping.toFixed(2)}`}
+                      {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
                     </span>
                   </div>
                   {shipping === 0 && (
@@ -239,7 +239,7 @@ export default function CartPage() {
                   <div className="pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
                     <div className="flex justify-between items-end">
                       <span className="font-black text-xs uppercase tracking-wider" style={{ color: '#52525b' }}>Total</span>
-                      <span className="text-3xl font-black tracking-tight ds-text-gradient ds-mono">£{total.toFixed(2)}</span>
+                      <span className="text-3xl font-black tracking-tight ds-text-gradient ds-mono">${total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>

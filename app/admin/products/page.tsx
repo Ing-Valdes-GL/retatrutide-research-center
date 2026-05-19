@@ -249,7 +249,7 @@ export default function AdminDashboard() {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       {/* MODIFICATION : Prix réduit à text-xl */}
-                      <span className="text-xl font-black text-black">£{Number(product.price).toFixed(2)}</span>
+                      <span className="text-xl font-black text-black">${Number(product.price).toFixed(2)}</span>
                       <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Stock: {product.stock}</span>
                     </div>
                     {/* COA Status Indicator */}
@@ -322,7 +322,7 @@ export default function AdminDashboard() {
                   <input required className="w-full bg-gray-50 p-3 rounded-xl border-none focus:ring-2 focus:ring-[#EF6C00] text-black text-sm" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-gray-400">Price (£) *</label>
+                  <label className="text-[10px] font-black uppercase text-gray-400">Price ($) *</label>
                   <input required type="number" step="0.01" className="w-full bg-gray-50 p-3 rounded-xl border-none focus:ring-2 focus:ring-[#EF6C00] text-black text-sm" value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
                 </div>
               </div>

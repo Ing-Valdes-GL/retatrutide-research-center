@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const itemsHtml = items.map((item: any) => `
       <tr>
         <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name} <br><strong>× ${item.quantity}</strong></td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">£${(item.price * item.quantity).toFixed(2)}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${(item.price * item.quantity).toFixed(2)}</td>
       </tr>
     `).join('');
 
@@ -39,10 +39,10 @@ export async function POST(req: Request) {
             ${itemsHtml}
           </tbody>
           <tfoot style="font-weight: bold;">
-            <tr><td style="padding: 8px;">Subtotal:</td><td style="text-align: right;">£${subtotal.toFixed(2)}</td></tr>
-            <tr><td style="padding: 8px; color: #FFA52F;">Discount:</td><td style="text-align: right; color: #FFA52F;">-£${discount.toFixed(2)}</td></tr>
-            <tr><td style="padding: 8px;">Shipping: Express Delivery</td><td style="text-align: right;">£${shipping.toFixed(2)}</td></tr>
-            <tr><td style="padding: 8px; font-size: 18px;">Total:</td><td style="text-align: right; font-size: 18px;">£${total.toFixed(2)}</td></tr>
+            <tr><td style="padding: 8px;">Subtotal:</td><td style="text-align: right;">$${subtotal.toFixed(2)}</td></tr>
+            <tr><td style="padding: 8px; color: #FFA52F;">Discount:</td><td style="text-align: right; color: #FFA52F;">-$${discount.toFixed(2)}</td></tr>
+            <tr><td style="padding: 8px;">Shipping: Express Delivery</td><td style="text-align: right;">$${shipping.toFixed(2)}</td></tr>
+            <tr><td style="padding: 8px; font-size: 18px;">Total:</td><td style="text-align: right; font-size: 18px;">$${total.toFixed(2)}</td></tr>
             <tr><td style="padding: 8px;">Payment method:</td><td style="text-align: right;">${paymentMethod}</td></tr>
           </tfoot>
         </table>

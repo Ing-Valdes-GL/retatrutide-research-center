@@ -137,7 +137,7 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
           {isAdmin && <StatCard title="Total_Users" value={stats.totalUsers} icon={<Users size={20}/>} theme={theme} />}
           <StatCard title="Orders_Volume" value={stats.totalOrders} icon={<ShoppingBag size={20}/>} theme={theme} />
-          {isAdmin && <StatCard title="Gross_Revenue" value={`${stats.totalRevenue.toLocaleString()} £`} icon={<DollarSign size={20}/>} theme={theme} isGold />}
+          {isAdmin && <StatCard title="Gross_Revenue" value={`${stats.totalRevenue.toLocaleString()} $`} icon={<DollarSign size={20}/>} theme={theme} isGold />}
           <StatCard title="Active_Transmissions" value={stats.pendingOrders} icon={<Clock size={20}/>} theme={theme} />
         </div>
 
@@ -180,7 +180,7 @@ export default function AdminDashboard() {
                       </td>
                     )}
                     <td className="p-8 text-right font-black text-base">
-                      <span className="opacity-30 text-xs mr-1">£</span>
+                      <span className="opacity-30 text-xs mr-1">$</span>
                       {Number(order.total_amount).toFixed(2)}
                     </td>
                     <td className="p-8 text-center">

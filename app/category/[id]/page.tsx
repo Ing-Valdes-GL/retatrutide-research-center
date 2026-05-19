@@ -100,7 +100,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
                     </Link>
 
                     <div className="mt-auto pt-4">
-                      <p className="font-black text-2xl mb-4 ds-text-gradient ds-mono">£{product.price}</p>
+                      <p className="font-black text-2xl mb-4 ds-text-gradient ds-mono">${product.price}</p>
                       <Link
                         href={`/products/${product.id}`}
                         className="w-full ds-btn-primary py-3 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2"

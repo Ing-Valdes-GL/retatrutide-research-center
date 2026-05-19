@@ -215,7 +215,7 @@ export default function CheckoutPage() {
                     <p className="text-[10px] mt-0.5" style={{ color: '#52525b' }}>× {item.quantity}</p>
                   </div>
                   <span className="font-black text-sm shrink-0 ds-text-gradient ds-mono">
-                    £{(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                    ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
                   </span>
                 </div>
               ))}
@@ -224,9 +224,9 @@ export default function CheckoutPage() {
             {/* Totals */}
             <div className="space-y-3 mb-6 pb-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
               {[
-                { label: 'Subtotal', value: `£${subtotal.toFixed(2)}`, color: '#fafafa' },
-                { label: 'Discount', value: `-£${discount.toFixed(2)}`, color: '#34d399' },
-                { label: 'Shipping', value: `£${shipping.toFixed(2)}`, color: '#fafafa' },
+                { label: 'Subtotal', value: `$${subtotal.toFixed(2)}`, color: '#fafafa' },
+                { label: 'Discount', value: `-$${discount.toFixed(2)}`, color: '#34d399' },
+                { label: 'Shipping', value: `$${shipping.toFixed(2)}`, color: '#fafafa' },
               ].map(({ label, value, color }) => (
                 <div key={label} className="flex justify-between text-sm">
                   <span className="font-medium" style={{ color: '#71717a' }}>{label}</span>
@@ -235,7 +235,7 @@ export default function CheckoutPage() {
               ))}
               <div className="flex justify-between items-end pt-2">
                 <span className="font-black text-xs uppercase tracking-wide" style={{ color: '#71717a' }}>Total</span>
-                <span className="text-3xl font-black ds-text-gradient ds-mono">£{total.toFixed(2)}</span>
+                <span className="text-3xl font-black ds-text-gradient ds-mono">${total.toFixed(2)}</span>
               </div>
             </div>
 
